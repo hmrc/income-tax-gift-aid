@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package config
+package services
 
-class MockAppConfig extends AppConfig {
+import connectors.GiftAidSubmissionConnector
+import connectors.httpParsers.GiftAidSubmissionHttpParser.GiftAidSubmissionResponse
+import models.submission.GiftAidSubmissionModel
+import uk.gov.hmrc.http.HeaderCarrier
 
-  override val authBaseUrl: String = "auth"
-  override val auditingEnabled: Boolean = false
-  override val graphiteHost: String = "localhost"
-  override val desBaseUrl: String = "des"
-  override val environment: String = "dev"
-  override val authorisationToken: String = "someToken"
+import javax.inject.Inject
+import scala.concurrent.Future
+
+class GiftAidSubmissionService @Inject()(connector: GiftAidSubmissionConnector) {
+
+  def submit(nino: String, taxYear: Int, giftAidSubmissionModel: GiftAidSubmissionModel)(implicit hc: HeaderCarrier): Future[GiftAidSubmissionResponse] = {
+    connector.submit(nino, taxYear, giftAidSubmissionModel)(hc)
+  }
+
 }

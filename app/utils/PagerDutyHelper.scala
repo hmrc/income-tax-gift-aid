@@ -40,4 +40,3 @@ object PagerDutyHelper extends Logging {
     }
   }
 }
-

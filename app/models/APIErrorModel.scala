@@ -14,14 +14,6 @@
  * limitations under the License.
  */
 
-package config
+package models
 
-class MockAppConfig extends AppConfig {
-
-  override val authBaseUrl: String = "auth"
-  override val auditingEnabled: Boolean = false
-  override val graphiteHost: String = "localhost"
-  override val desBaseUrl: String = "des"
-  override val environment: String = "dev"
-  override val authorisationToken: String = "someToken"
-}
+case class APIErrorModel()

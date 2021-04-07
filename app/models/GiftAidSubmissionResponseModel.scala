@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package config
+package models
 
-class MockAppConfig extends AppConfig {
+import play.api.libs.json.{Json, OWrites, Reads}
 
-  override val authBaseUrl: String = "auth"
-  override val auditingEnabled: Boolean = false
-  override val graphiteHost: String = "localhost"
-  override val desBaseUrl: String = "des"
-  override val environment: String = "dev"
-  override val authorisationToken: String = "someToken"
+case class GiftAidSubmissionResponseModel(transactionReference: String)
+
+object GiftAidSubmissionResponseModel {
+  implicit val reads: Reads[GiftAidSubmissionResponseModel] = Json.reads[GiftAidSubmissionResponseModel]
+  implicit val writes: OWrites[GiftAidSubmissionResponseModel] = Json.writes[GiftAidSubmissionResponseModel]
 }

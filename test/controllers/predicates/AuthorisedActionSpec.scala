@@ -28,11 +28,11 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.syntax.retrieved.authSyntaxForRetrieved
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments, _}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.TestUtils
+import utils.UnitTest
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthorisedActionSpec extends TestUtils {
+class AuthorisedActionSpec extends UnitTest {
 
   val auth: AuthorisedAction = authorisedAction
 

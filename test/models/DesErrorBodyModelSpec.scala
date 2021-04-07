@@ -18,11 +18,10 @@ package models
 
 import com.codahale.metrics.SharedMetricRegistries
 import controllers.Assets.SERVICE_UNAVAILABLE
-import models.giftAid.{GiftAidPaymentsModel, SubmittedGiftAidModel}
 import play.api.libs.json.{JsObject, Json}
-import utils.TestUtils
+import utils.UnitTest
 
-class DesErrorBodyModelSpec extends TestUtils {
+class DesErrorBodyModelSpec extends UnitTest {
   SharedMetricRegistries.clear()
 
   val model: DesErrorBodyModel = DesErrorBodyModel("SERVER_ERROR", "Service is unavailable")

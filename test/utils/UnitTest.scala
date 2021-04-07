@@ -27,6 +27,7 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContentAsEmpty, ControllerComponents, DefaultActionBuilder, Result}
 import play.api.test.{FakeRequest, Helpers}
 import services.AuthService
@@ -40,12 +41,14 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Awaitable, ExecutionContext, Future}
 
-trait TestUtils extends AnyWordSpec with Matchers with MockFactory with BeforeAndAfterEach {
+trait UnitTest extends AnyWordSpec with Matchers with MockFactory with BeforeAndAfterEach {
 
   override def beforeEach(): Unit = {
     super.beforeEach()
     SharedMetricRegistries.clear()
   }
+
+  implicit def nonOptionalToOptional[T]: T => Option[T] = nonOptionalValue => Some(nonOptionalValue)
 
   implicit val actorSystem: ActorSystem = ActorSystem()
   implicit val materializer: Materializer = ActorMaterializer()
@@ -70,6 +73,10 @@ trait TestUtils extends AnyWordSpec with Matchers with MockFactory with BeforeAn
 
   def bodyOf(awaitable: Future[Result]): String = {
     await(awaitable.flatMap(_.body.consumeData.map(_.utf8String)))
+  }
+
+  def jsonBodyOf(awaitable: Future[Result]): JsValue = {
+    Json.parse(await(awaitable.flatMap(_.body.consumeData.map(_.utf8String))))
   }
 
   val individualEnrolments: Enrolments = Enrolments(Set(

@@ -1,2 +1,2 @@
-
-GET        /income-tax/nino/:nino/sources             controllers.SubmittedGiftAidController.getSubmittedGiftAid(nino:String, taxYear: Int)
+GET         /nino/:nino/sources        controllers.SubmittedGiftAidController.getSubmittedGiftAid(nino:String, taxYear: Int)
+POST        /nino/:nino/sources        controllers.GiftAidSubmissionController.submit(nino: String, taxYear: Int)

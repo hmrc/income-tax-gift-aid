@@ -18,9 +18,9 @@ package models
 
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
-import utils.TestUtils
+import utils.UnitTest
 
-class UserSpec extends TestUtils {
+class UserSpec extends UnitTest {
 
   ".isAgent" should {
 

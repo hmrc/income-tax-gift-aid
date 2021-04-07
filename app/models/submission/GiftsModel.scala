@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package common
+package models.submission
 
-import com.google.inject.AbstractModule
-import config.{AppConfig, BackendAppConfig}
+import play.api.libs.json.{Json, OFormat}
 
-class Modules extends AbstractModule {
-  override def configure(): Unit = {
-    bind(classOf[AppConfig]).to(classOf[BackendAppConfig]).asEagerSingleton()
-  }
+case class GiftsModel(
+                       investmentsNonUkCharitiesCharityNames: Option[Seq[String]],
+                       landAndBuildings: Option[BigDecimal],
+                       sharesOrSecurities: Option[BigDecimal],
+                       investmentsNonUkCharities: Option[BigDecimal]
+                     )
+
+object GiftsModel {
+  implicit val formats: OFormat[GiftsModel] = Json.format[GiftsModel]
 }
