@@ -16,7 +16,7 @@
 
 package connectors.httpParsers
 
-import models.giftaid.SubmittedGiftAidModel
+import models.giftAid.SubmittedGiftAidModel
 import models.DesErrorModel
 import play.api.Logging
 import play.api.http.Status._

@@ -17,7 +17,7 @@
 package controllers
 
 import connectors.httpParsers.SubmittedGiftAidHttpParser.SubmittedGiftAidResponse
-import models.giftaid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
+import models.giftAid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
 import models.{DesErrorBodyModel, DesErrorModel}
 import org.scalamock.handlers.CallHandler3
 import play.api.http.Status._
@@ -42,8 +42,8 @@ class SubmittedGiftAidControllerSpec extends TestUtils {
   private val fakeGetRequest = FakeRequest("GET", "/").withHeaders("mtditid" -> mtdItID)
   private val fakeGetRequestWithDifferentMTDITID = FakeRequest("GET", "/").withHeaders("mtditid" -> "123123123")
 
-  val giftAidPayments: GiftAidPaymentsModel = GiftAidPaymentsModel(List(""), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67))
-  val gifts: GiftsModel = GiftsModel(List(""), Some(12345.67), Some(12345.67) ,Some(12345.67))
+  val giftAidPayments: GiftAidPaymentsModel = GiftAidPaymentsModel(Some(List("")), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67))
+  val gifts: GiftsModel = GiftsModel(Some(List("")), Some(12345.67), Some(12345.67) ,Some(12345.67))
 
   def mockGetSubmittedGiftAidValid(): CallHandler3[String, Int, HeaderCarrier, Future[SubmittedGiftAidResponse]] = {
     val validSubmittedGiftAid: SubmittedGiftAidResponse = Right(SubmittedGiftAidModel(Some(giftAidPayments), Some(gifts)))

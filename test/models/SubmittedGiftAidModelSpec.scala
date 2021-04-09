@@ -16,14 +16,14 @@
 
 package models
 
-import models.giftaid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
+import models.giftAid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
 import play.api.libs.json.{JsObject, Json}
 import utils.TestUtils
 
 class SubmittedGiftAidModelSpec extends TestUtils {
 
   val validGiftAidPaymentsModel: GiftAidPaymentsModel = GiftAidPaymentsModel(
-    nonUkCharitiesCharityNames = List("non uk charity name","non uk charity name 2"),
+    nonUkCharitiesCharityNames = Some(List("non uk charity name","non uk charity name 2")),
     currentYear = Some(12345.67),
     oneOffCurrentYear = Some(12345.67),
     currentYearTreatedAsPreviousYear = Some(12345.67),
@@ -32,7 +32,7 @@ class SubmittedGiftAidModelSpec extends TestUtils {
   )
 
   val validGiftsModel: GiftsModel = GiftsModel(
-    investmentsNonUkCharitiesCharityNames = List("charity name"),
+    investmentsNonUkCharitiesCharityNames = Some(List("charity name")),
     landAndBuildings = Some(12345.67),
     sharesOrSecurities = Some(12345.67),
     investmentsNonUkCharities = Some(12345.67)

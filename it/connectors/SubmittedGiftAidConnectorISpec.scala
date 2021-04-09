@@ -17,7 +17,7 @@
 package connectors
 
 import helpers.WiremockSpec
-import models.giftaid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
+import models.giftAid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
 import models.{DesErrorBodyModel, DesErrorModel, DesErrorsBodyModel}
 import org.scalatestplus.play.PlaySpec
 import play.api.http.Status._
@@ -30,8 +30,8 @@ class SubmittedGiftAidConnectorISpec extends PlaySpec with WiremockSpec{
 
   val nino: String = "123456789"
   val taxYear: Int = 1999
-  val giftAidPayments: GiftAidPaymentsModel = GiftAidPaymentsModel(List(""), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67))
-  val gifts: GiftsModel = GiftsModel(List(""), Some(12345.67), Some(12345.67) , Some(12345.67))
+  val giftAidPayments: GiftAidPaymentsModel = GiftAidPaymentsModel(Some(List("")), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67))
+  val gifts: GiftsModel = GiftsModel(Some(List("")), Some(12345.67), Some(12345.67) , Some(12345.67))
 
   ".SubmittedGiftAidConnector" should {
     "return a SubmittedGiftAidModel" when {

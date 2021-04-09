@@ -19,7 +19,7 @@ package services
 import com.codahale.metrics.SharedMetricRegistries
 import connectors.SubmittedGiftAidConnector
 import connectors.httpParsers.SubmittedGiftAidHttpParser.SubmittedGiftAidResponse
-import models.giftaid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
+import models.giftAid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.TestUtils
 
@@ -31,8 +31,8 @@ class SubmittedGiftAidServiceSpec extends TestUtils {
   val connector: SubmittedGiftAidConnector = mock[SubmittedGiftAidConnector]
   val service: SubmittedGiftAidService = new SubmittedGiftAidService(connector)
 
-  val giftAidPayments: GiftAidPaymentsModel = GiftAidPaymentsModel(List(""), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67))
-  val gifts: GiftsModel = GiftsModel(List(""), Some(12345.67), Some(12345.67) ,Some(12345.67))
+  val giftAidPayments: GiftAidPaymentsModel = GiftAidPaymentsModel(Some(List("")), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67))
+  val gifts: GiftsModel = GiftsModel(Some(List("")), Some(12345.67), Some(12345.67) ,Some(12345.67))
 
   ".getSubmittedGiftAid" should {
 

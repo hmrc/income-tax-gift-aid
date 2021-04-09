@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package models.giftaid
+package models.giftAid
 
 import play.api.libs.json.{Json, OFormat}
 
-case class GiftAidPaymentsModel(nonUkCharitiesCharityNames: List[String],
+case class GiftAidPaymentsModel(nonUkCharitiesCharityNames: Option[List[String]],
                                 currentYear: Option[BigDecimal],
                                 oneOffCurrentYear: Option[BigDecimal],
                                 currentYearTreatedAsPreviousYear: Option[BigDecimal],

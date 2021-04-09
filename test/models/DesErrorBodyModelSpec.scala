@@ -18,7 +18,7 @@ package models
 
 import com.codahale.metrics.SharedMetricRegistries
 import controllers.Assets.SERVICE_UNAVAILABLE
-import models.giftaid.{GiftAidPaymentsModel, SubmittedGiftAidModel}
+import models.giftAid.{GiftAidPaymentsModel, SubmittedGiftAidModel}
 import play.api.libs.json.{JsObject, Json}
 import utils.TestUtils
 
