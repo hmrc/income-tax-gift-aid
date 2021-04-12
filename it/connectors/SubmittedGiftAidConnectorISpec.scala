@@ -23,14 +23,17 @@ import org.scalatestplus.play.PlaySpec
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.IntegrationTest
 
-class SubmittedGiftAidConnectorISpec extends PlaySpec with WiremockSpec{
+class SubmittedGiftAidConnectorISpec extends IntegrationTest {
 
   lazy val connector: SubmittedGiftAidConnector = app.injector.instanceOf[SubmittedGiftAidConnector]
 
   val nino: String = "123456789"
   val taxYear: Int = 1999
-  val giftAidPayments: GiftAidPaymentsModel = GiftAidPaymentsModel(Some(List("")), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67))
+  val giftAidPayments: GiftAidPaymentsModel = GiftAidPaymentsModel(
+    Some(List("")), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67)
+  )
   val gifts: GiftsModel = GiftsModel(Some(List("")), Some(12345.67), Some(12345.67) , Some(12345.67))
 
   ".SubmittedGiftAidConnector" should {
@@ -43,7 +46,7 @@ class SubmittedGiftAidConnectorISpec extends PlaySpec with WiremockSpec{
         implicit val hc = HeaderCarrier()
         val result = await(connector.getSubmittedGiftAid(nino, taxYear)(hc))
 
-        result mustBe Right(expectedResult)
+        result shouldBe Right(expectedResult)
       }
     }
 
@@ -65,7 +68,7 @@ class SubmittedGiftAidConnectorISpec extends PlaySpec with WiremockSpec{
       implicit val hc: HeaderCarrier = HeaderCarrier()
       val result = await(connector.getSubmittedGiftAid(nino, taxYear)(hc))
 
-      result mustBe Left(expectedResult)
+      result shouldBe Left(expectedResult)
     }
 
     "return a Parsing error INTERNAL_SERVER_ERROR response" in {
@@ -79,7 +82,7 @@ class SubmittedGiftAidConnectorISpec extends PlaySpec with WiremockSpec{
       implicit val hc = HeaderCarrier()
       val result = await(connector.getSubmittedGiftAid(nino, taxYear)(hc))
 
-      result mustBe Left(expectedResult)
+      result shouldBe Left(expectedResult)
     }
 
     "return a NO_CONTENT" in {
@@ -89,7 +92,7 @@ class SubmittedGiftAidConnectorISpec extends PlaySpec with WiremockSpec{
       implicit val hc = HeaderCarrier()
       val result = await(connector.getSubmittedGiftAid(nino, taxYear)(hc))
 
-      result mustBe Left(expectedResult)
+      result shouldBe Left(expectedResult)
     }
 
     "return a Bad Request" in {
@@ -103,7 +106,7 @@ class SubmittedGiftAidConnectorISpec extends PlaySpec with WiremockSpec{
       implicit val hc = HeaderCarrier()
       val result = await(connector.getSubmittedGiftAid(nino, taxYear)(hc))
 
-      result mustBe Left(expectedResult)
+      result shouldBe Left(expectedResult)
     }
 
     "return a Not found" in {
@@ -117,7 +120,7 @@ class SubmittedGiftAidConnectorISpec extends PlaySpec with WiremockSpec{
       implicit val hc = HeaderCarrier()
       val result = await(connector.getSubmittedGiftAid(nino, taxYear)(hc))
 
-      result mustBe Left(expectedResult)
+      result shouldBe Left(expectedResult)
     }
 
     "return an Internal server error" in {
@@ -131,7 +134,7 @@ class SubmittedGiftAidConnectorISpec extends PlaySpec with WiremockSpec{
       implicit val hc = HeaderCarrier()
       val result = await(connector.getSubmittedGiftAid(nino, taxYear)(hc))
 
-      result mustBe Left(expectedResult)
+      result shouldBe Left(expectedResult)
     }
 
     "return a Service Unavailable" in {
@@ -145,7 +148,7 @@ class SubmittedGiftAidConnectorISpec extends PlaySpec with WiremockSpec{
       implicit val hc = HeaderCarrier()
       val result = await(connector.getSubmittedGiftAid(nino, taxYear)(hc))
 
-      result mustBe Left(expectedResult)
+      result shouldBe Left(expectedResult)
     }
 
     "return an Internal Server Error when DES throws an unexpected result" in {
@@ -155,7 +158,7 @@ class SubmittedGiftAidConnectorISpec extends PlaySpec with WiremockSpec{
       implicit val hc: HeaderCarrier = HeaderCarrier()
       val result = await(connector.getSubmittedGiftAid(nino, taxYear)(hc))
 
-      result mustBe Left(expectedResult)
+      result shouldBe Left(expectedResult)
     }
 
     "return an Internal Server Error when DES throws an unexpected result that is parsable" in {
@@ -169,7 +172,7 @@ class SubmittedGiftAidConnectorISpec extends PlaySpec with WiremockSpec{
       implicit val hc: HeaderCarrier = HeaderCarrier()
       val result = await(connector.getSubmittedGiftAid(nino, taxYear)(hc))
 
-      result mustBe Left(expectedResult)
+      result shouldBe Left(expectedResult)
     }
 
     "return an Internal Server Error when DES throws an unexpected result that isn't parsable" in {
@@ -182,7 +185,7 @@ class SubmittedGiftAidConnectorISpec extends PlaySpec with WiremockSpec{
       implicit val hc: HeaderCarrier = HeaderCarrier()
       val result = await(connector.getSubmittedGiftAid(nino, taxYear)(hc))
 
-      result mustBe Left(expectedResult)
+      result shouldBe Left(expectedResult)
     }
   }
 }
