@@ -16,10 +16,8 @@
 
 package connectors
 
-import helpers.WiremockSpec
 import models.giftAid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
 import models.{DesErrorBodyModel, DesErrorModel, DesErrorsBodyModel}
-import org.scalatestplus.play.PlaySpec
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
@@ -43,7 +41,7 @@ class SubmittedGiftAidConnectorISpec extends IntegrationTest {
 
         stubGetWithResponseBody(s"/income-tax/nino/$nino/income-source/charity/annual/$taxYear", OK, Json.toJson(expectedResult).toString())
 
-        implicit val hc = HeaderCarrier()
+        implicit val hc: HeaderCarrier = HeaderCarrier()
         val result = await(connector.getSubmittedGiftAid(nino, taxYear)(hc))
 
         result shouldBe Right(expectedResult)

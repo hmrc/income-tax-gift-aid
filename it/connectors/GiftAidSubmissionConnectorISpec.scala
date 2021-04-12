@@ -34,7 +34,7 @@ class GiftAidSubmissionConnectorISpec extends IntegrationTest {
   ".submit" should {
 
     "return a response model with the data des returns" in {
-      val expectedBody: String = Json.stringify(Json.obj("giftAidPayments" -> Json.toJson(submissionModel)))
+      val expectedBody: String = Json.stringify(Json.toJson(submissionModel))
       val responseBody: String = Json.stringify(Json.toJson(GiftAidSubmissionResponseModel("im-an-id-yay")))
 
       val result = {
@@ -46,7 +46,7 @@ class GiftAidSubmissionConnectorISpec extends IntegrationTest {
     }
 
     "return an error model when des returns an error" in {
-      val expectedBody: String = Json.stringify(Json.obj("giftAidPayments" -> Json.toJson(submissionModel)))
+      val expectedBody: String = Json.stringify(Json.toJson(submissionModel))
       val responseBody: String = """{ "code": "oh-noes", "reason": "somethin' sank the ship" }"""
 
       val result = {
@@ -58,7 +58,7 @@ class GiftAidSubmissionConnectorISpec extends IntegrationTest {
     }
 
     "return multiple errors when des does so" in {
-      val expectedBody: String = Json.stringify(Json.obj("giftAidPayments" -> Json.toJson(submissionModel)))
+      val expectedBody: String = Json.stringify(Json.toJson(submissionModel))
       val responseBody: String = """{ "failures": [{ "code": "oh-noes", "reason": "somethin' sank the ship" }, { "code": "wut", "reason": "but how?!" }]}"""
 
       val result = {

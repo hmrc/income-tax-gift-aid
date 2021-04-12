@@ -29,7 +29,6 @@ case class DesErrorModel(status: Int, body: DesErrorBody){
   }
 }
 
-/** Single DES Error **/
 case class DesErrorBodyModel(code: String, reason: String) extends DesErrorBody
 
 object DesErrorBodyModel {
@@ -37,7 +36,6 @@ object DesErrorBodyModel {
   val parsingError: DesErrorBodyModel = DesErrorBodyModel("PARSING_ERROR", "Error parsing response from DES")
 }
 
-/** Multiple DES Errors **/
 case class DesErrorsBodyModel(failures: Seq[DesErrorBodyModel]) extends DesErrorBody
 
 object DesErrorsBodyModel {

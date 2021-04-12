@@ -38,11 +38,7 @@ class GiftAidSubmissionConnector @Inject()(
     val desCall: String = appConfig.desBaseUrl + s"/income-tax/nino/$nino/income-source/charity/" +
       s"annual/$taxYear"
 
-    val body = Json.obj(
-      "giftAidPayments" -> Json.toJson(submissionModel)
-    )
-
-    http.POST[JsValue, GiftAidSubmissionResponse](desCall, body)
+    http.POST[GiftAidSubmissionModel, GiftAidSubmissionResponse](desCall, submissionModel)
   }
 
 }
