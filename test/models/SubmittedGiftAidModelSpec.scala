@@ -18,9 +18,9 @@ package models
 
 import models.giftAid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
 import play.api.libs.json.{JsObject, Json}
-import utils.TestUtils
+import utils.UnitTest
 
-class SubmittedGiftAidModelSpec extends TestUtils {
+class SubmittedGiftAidModelSpec extends UnitTest {
 
   val validGiftAidPaymentsModel: GiftAidPaymentsModel = GiftAidPaymentsModel(
     nonUkCharitiesCharityNames = Some(List("non uk charity name","non uk charity name 2")),

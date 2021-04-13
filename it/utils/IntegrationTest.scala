@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package config
+package utils
 
-class MockAppConfig extends AppConfig {
+import helpers.WiremockSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+import uk.gov.hmrc.http.HeaderCarrier
 
-  override val authBaseUrl: String = "auth"
-  override val auditingEnabled: Boolean = false
-  override val graphiteHost: String = "localhost"
-  override val desBaseUrl: String = "des"
-  override val environment: String = "dev"
-  override val authorisationToken: String = "someToken"
+trait IntegrationTest extends AnyWordSpec with Matchers with WiremockSpec {
+  lazy val emptyHeaderCarrier: HeaderCarrier = HeaderCarrier()
 }

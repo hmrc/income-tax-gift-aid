@@ -19,9 +19,9 @@ package connectors
 import config.AppConfig
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.logging.Authorization
-import utils.TestUtils
+import utils.UnitTest
 
-class DesConnectorSpec extends TestUtils{
+class DesConnectorSpec extends UnitTest {
 
   class FakeConnector(override val appConfig: AppConfig) extends DesConnector {
     def headerCarrierTest(hc: HeaderCarrier): HeaderCarrier = desHeaderCarrier(hc)

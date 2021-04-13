@@ -16,12 +16,10 @@
 
 package config
 
-class MockAppConfig extends AppConfig {
+import com.google.inject.AbstractModule
 
-  override val authBaseUrl: String = "auth"
-  override val auditingEnabled: Boolean = false
-  override val graphiteHost: String = "localhost"
-  override val desBaseUrl: String = "des"
-  override val environment: String = "dev"
-  override val authorisationToken: String = "someToken"
+class Modules extends AbstractModule {
+  override def configure(): Unit = {
+    bind(classOf[AppConfig]).to(classOf[BackendAppConfig]).asEagerSingleton()
+  }
 }
