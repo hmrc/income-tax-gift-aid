@@ -19,7 +19,6 @@ package connectors
 import config.AppConfig
 import connectors.httpParsers.GiftAidSubmissionHttpParser._
 import models.submission.GiftAidSubmissionModel
-import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 import javax.inject.Inject
