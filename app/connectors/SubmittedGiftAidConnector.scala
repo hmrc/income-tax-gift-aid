@@ -34,6 +34,6 @@ class SubmittedGiftAidConnector @Inject() (val http: HttpClient,
       http.GET[SubmittedGiftAidResponse](incomeSourcesUri)
     }
 
-    desCall(desHeaderCarrier)
+    desCall(desHeaderCarrier(incomeSourcesUri))
   }
 }

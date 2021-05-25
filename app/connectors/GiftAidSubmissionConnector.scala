@@ -31,13 +31,16 @@ class GiftAidSubmissionConnector @Inject()(
 
   def submit(
               nino: String, taxYear: Int, submissionModel: GiftAidSubmissionModel
-            )(headerCarrier: HeaderCarrier): Future[GiftAidSubmissionResponse] = {
-    implicit val desHC: HeaderCarrier = desHeaderCarrier(headerCarrier)
+            )(implicit hc: HeaderCarrier): Future[GiftAidSubmissionResponse] = {
 
-    val desCall: String = appConfig.desBaseUrl + s"/income-tax/nino/$nino/income-source/charity/" +
+    val giftAidSubmissionUri: String = appConfig.desBaseUrl + s"/income-tax/nino/$nino/income-source/charity/" +
       s"annual/$taxYear"
 
-    http.POST[GiftAidSubmissionModel, GiftAidSubmissionResponse](desCall, submissionModel)
+    def desCall(implicit hc: HeaderCarrier): Future[GiftAidSubmissionResponse] = {
+      http.POST[GiftAidSubmissionModel, GiftAidSubmissionResponse](giftAidSubmissionUri, submissionModel)
+    }
+
+    desCall(desHeaderCarrier(giftAidSubmissionUri))
   }
 
 }
