@@ -21,7 +21,7 @@ import models.submission.GiftAidSubmissionModel
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import services.GiftAidSubmissionService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.HeaderCarrierConverter
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
@@ -34,7 +34,7 @@ class GiftAidSubmissionController @Inject()(
                                            )(implicit ec: ExecutionContext) extends BackendController(cc) {
 
   def submit(nino: String, taxYear: Int): Action[AnyContent] = auth.async { user =>
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(user.headers, Some(user.session))
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(user, user.session)
     val requestContent = user.body.asJson.flatMap(_.asOpt[GiftAidSubmissionModel])
 
     requestContent match {

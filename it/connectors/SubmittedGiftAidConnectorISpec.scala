@@ -16,30 +16,78 @@
 
 package connectors
 
+import com.github.tomakehurst.wiremock.http.HttpHeader
+import config.{AppConfig, BackendAppConfig}
 import models.giftAid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
 import models.{DesErrorBodyModel, DesErrorModel, DesErrorsBodyModel}
+import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
+import play.api.Configuration
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, SessionId}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.IntegrationTest
 
 class SubmittedGiftAidConnectorISpec extends IntegrationTest {
 
   lazy val connector: SubmittedGiftAidConnector = app.injector.instanceOf[SubmittedGiftAidConnector]
 
+  lazy val httpClient: HttpClient = app.injector.instanceOf[HttpClient]
+
+  def appConfig(desHost: String): AppConfig = new BackendAppConfig(app.injector.instanceOf[Configuration], app.injector.instanceOf[ServicesConfig]) {
+    override val desBaseUrl: String = s"http://$desHost:$wireMockPort"
+  }
+
   val nino: String = "123456789"
   val taxYear: Int = 1999
+
+  val url = s"/income-tax/nino/$nino/income-source/charity/annual/$taxYear"
+
   val giftAidPayments: GiftAidPaymentsModel = GiftAidPaymentsModel(
     Some(List("")), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67)
   )
   val gifts: GiftsModel = GiftsModel(Some(List("")), Some(12345.67), Some(12345.67) , Some(12345.67))
 
   ".SubmittedGiftAidConnector" should {
+
+    "include internal headers" when {
+      val responseBody: String = Json.stringify(Json.toJson(SubmittedGiftAidModel(Some(giftAidPayments), Some(gifts))))
+
+      val headersSentToDes = Seq(
+        new HttpHeader(HeaderNames.authorisation, "Bearer secret"),
+        new HttpHeader(HeaderNames.xSessionId, "sessionIdValue")
+      )
+
+      val externalHost = "127.0.0.1"
+
+      "the host for DES is 'Internal'" in {
+        implicit val hc: HeaderCarrier = HeaderCarrier(sessionId = Some(SessionId("sessionIdValue")))
+
+        stubGetWithResponseBody(url, OK, responseBody, headersSentToDes)
+
+        val result = await(connector.getSubmittedGiftAid(nino, taxYear)(hc))
+
+        result mustBe Right(SubmittedGiftAidModel(Some(giftAidPayments), Some(gifts)))
+      }
+
+      "the host for DES is 'External'" in {
+        implicit val hc: HeaderCarrier = HeaderCarrier(sessionId = Some(SessionId("sessionIdValue")))
+        val connector = new SubmittedGiftAidConnector(httpClient, appConfig(externalHost))
+
+        stubGetWithResponseBody(url, OK, responseBody, headersSentToDes)
+
+        val result = await(connector.getSubmittedGiftAid(nino, taxYear)(hc))
+
+        result mustBe Right(SubmittedGiftAidModel(Some(giftAidPayments), Some(gifts)))
+      }
+    }
+
+
     "return a SubmittedGiftAidModel" when {
       "all values are present" in {
         val expectedResult = SubmittedGiftAidModel(Some(giftAidPayments), Some(gifts))
 
-        stubGetWithResponseBody(s"/income-tax/nino/$nino/income-source/charity/annual/$taxYear", OK, Json.toJson(expectedResult).toString())
+        stubGetWithResponseBody(url, OK, Json.toJson(expectedResult).toString())
 
         implicit val hc: HeaderCarrier = HeaderCarrier()
         val result = await(connector.getSubmittedGiftAid(nino, taxYear)(hc))
