@@ -51,7 +51,6 @@ trait UnitTest extends AnyWordSpec with Matchers with MockFactory with BeforeAnd
   implicit def nonOptionalToOptional[T]: T => Option[T] = nonOptionalValue => Some(nonOptionalValue)
 
   implicit val actorSystem: ActorSystem = ActorSystem()
-  implicit val materializer: Materializer = ActorMaterializer()
 
   def await[T](awaitable: Awaitable[T]): T = Await.result(awaitable, Duration.Inf)
 

@@ -20,17 +20,18 @@ import sbt._
 object AppDependencies {
 
   val compile: Seq[ModuleID] = Seq(
-    "uk.gov.hmrc"             %% "bootstrap-backend-play-27"  % "5.3.0"
+    "uk.gov.hmrc"             %% "bootstrap-backend-play-28"  % "5.3.0",
+    "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.12.2"
   )
 
-  val test: Seq[ModuleID] = Seq(
-    "uk.gov.hmrc"             %% "bootstrap-test-play-27"   % "5.3.0",
+  val test = Seq(
+    "uk.gov.hmrc"             %% "bootstrap-test-play-28"   % "5.3.0",
     "org.scalatest"           %% "scalatest"                % "3.2.9",
+    "org.jsoup"               %  "jsoup"                    % "1.13.1",
     "com.typesafe.play"       %% "play-test"                % current,
-    "org.pegdown"             %  "pegdown"                  % "1.6.0",
-    "com.vladsch.flexmark"    %  "flexmark-all"             % "0.36.8",
-    "org.scalatestplus.play"  %% "scalatestplus-play"       % "4.0.3",
+    "org.scalatestplus.play"  %% "scalatestplus-play"       % "5.1.0",
     "com.github.tomakehurst"  %  "wiremock-jre8"            % "2.28.0",
-    "org.scalamock"           %% "scalamock"                % "5.1.0"
+    "org.scalamock"           %% "scalamock"                % "5.1.0",
+    "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-28"  % "0.50.0"
   ).map(_ % "test, it")
 }
