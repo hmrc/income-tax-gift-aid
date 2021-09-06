@@ -58,6 +58,20 @@ class GiftAidSubmissionHttpParserSpec extends UnitTest {
         result shouldBe Left(DesErrorModel(INTERNAL_SERVER_ERROR, DesErrorBodyModel.parsingError))
       }
 
+      "the response status is NOT_FOUND" in {
+        val errorBody = Json.prettyPrint(Json.obj("code" -> "NOT_FOUND", "reason" -> "Submission Period not found"))
+        val result = read("POST", "/some-url", httpResponse(NOT_FOUND, errorBody))
+
+        result shouldBe Left(DesErrorModel(NOT_FOUND, DesErrorBodyModel("NOT_FOUND", "Submission Period not found")))
+      }
+
+      "the response status is UNPROCESSABLE_ENTITY" in {
+        val errorBody = Json.prettyPrint(Json.obj("code" -> "UNPROCESSABLE_ENTITY", "reason" -> "The remote endpoint has indicated that for given income source type, message payload is incorrect."))
+        val result = read("POST", "/some-url", httpResponse(UNPROCESSABLE_ENTITY, errorBody))
+
+        result shouldBe Left(DesErrorModel(UNPROCESSABLE_ENTITY, DesErrorBodyModel("UNPROCESSABLE_ENTITY", "The remote endpoint has indicated that for given income source type, message payload is incorrect.")))
+      }
+
       "the response status is INTERNAL_SERVER_ERROR" in {
         val errorBody = Json.prettyPrint(Json.obj("code" -> "AWW_MAN", "reason" -> "not again"))
         val result = read("POST", "/some-url", httpResponse(INTERNAL_SERVER_ERROR, errorBody))
