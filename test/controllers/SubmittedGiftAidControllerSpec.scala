@@ -18,7 +18,7 @@ package controllers
 
 import connectors.httpParsers.SubmittedGiftAidHttpParser.SubmittedGiftAidResponse
 import models.giftAid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
-import models.{DesErrorBodyModel, DesErrorModel}
+import models.{ErrorBodyModel, ErrorModel}
 import org.scalamock.handlers.CallHandler3
 import play.api.http.Status._
 import play.api.test.FakeRequest
@@ -35,10 +35,10 @@ class SubmittedGiftAidControllerSpec extends UnitTest {
   val nino :String = "123456789"
   val mtdItID :String = "1234567890"
   val taxYear: Int = 1234
-  val badRequestModel: DesErrorBodyModel = DesErrorBodyModel("INVALID_NINO", "Nino is invalid")
-  val notFoundModel: DesErrorBodyModel = DesErrorBodyModel("NOT_FOUND_INCOME_SOURCE", "Can't find income source")
-  val serverErrorModel: DesErrorBodyModel = DesErrorBodyModel("SERVER_ERROR", "Internal server error")
-  val serviceUnavailableErrorModel: DesErrorBodyModel = DesErrorBodyModel("SERVICE_UNAVAILABLE", "Service is unavailable")
+  val badRequestModel: ErrorBodyModel = ErrorBodyModel("INVALID_NINO", "Nino is invalid")
+  val notFoundModel: ErrorBodyModel = ErrorBodyModel("NOT_FOUND_INCOME_SOURCE", "Can't find income source")
+  val serverErrorModel: ErrorBodyModel = ErrorBodyModel("SERVER_ERROR", "Internal server error")
+  val serviceUnavailableErrorModel: ErrorBodyModel = ErrorBodyModel("SERVICE_UNAVAILABLE", "Service is unavailable")
   private val fakeGetRequest = FakeRequest("GET", "/").withHeaders("mtditid" -> mtdItID)
   private val fakeGetRequestWithDifferentMTDITID = FakeRequest("GET", "/").withHeaders("mtditid" -> "123123123")
 
@@ -55,28 +55,28 @@ class SubmittedGiftAidControllerSpec extends UnitTest {
   }
 
   def mockGetSubmittedGiftAidBadRequest(): CallHandler3[String, Int, HeaderCarrier, Future[SubmittedGiftAidResponse]] = {
-    val invalidSubmittedGiftAid: SubmittedGiftAidResponse = Left(DesErrorModel(BAD_REQUEST, badRequestModel))
+    val invalidSubmittedGiftAid: SubmittedGiftAidResponse = Left(ErrorModel(BAD_REQUEST, badRequestModel))
     (submittedGiftAidService.getSubmittedGiftAid(_: String, _: Int)(_: HeaderCarrier))
       .expects(*, *, *)
       .returning(Future.successful(invalidSubmittedGiftAid))
   }
 
   def mockGetSubmittedGiftAidNotFound(): CallHandler3[String, Int, HeaderCarrier, Future[SubmittedGiftAidResponse]] = {
-    val invalidSubmittedGiftAid: SubmittedGiftAidResponse = Left(DesErrorModel(NOT_FOUND, notFoundModel))
+    val invalidSubmittedGiftAid: SubmittedGiftAidResponse = Left(ErrorModel(NOT_FOUND, notFoundModel))
     (submittedGiftAidService.getSubmittedGiftAid(_: String, _: Int)(_: HeaderCarrier))
       .expects(*, *, *)
       .returning(Future.successful(invalidSubmittedGiftAid))
   }
 
   def mockGetSubmittedGiftAidServerError(): CallHandler3[String, Int, HeaderCarrier, Future[SubmittedGiftAidResponse]] = {
-    val invalidSubmittedGiftAid: SubmittedGiftAidResponse = Left(DesErrorModel(INTERNAL_SERVER_ERROR, serverErrorModel))
+    val invalidSubmittedGiftAid: SubmittedGiftAidResponse = Left(ErrorModel(INTERNAL_SERVER_ERROR, serverErrorModel))
     (submittedGiftAidService.getSubmittedGiftAid(_: String, _: Int)(_: HeaderCarrier))
       .expects(*, *, *)
       .returning(Future.successful(invalidSubmittedGiftAid))
   }
 
   def mockGetSubmittedGiftAidServiceUnavailable(): CallHandler3[String, Int, HeaderCarrier, Future[SubmittedGiftAidResponse]] = {
-    val invalidSubmittedGiftAid: SubmittedGiftAidResponse = Left(DesErrorModel(SERVICE_UNAVAILABLE, serviceUnavailableErrorModel))
+    val invalidSubmittedGiftAid: SubmittedGiftAidResponse = Left(ErrorModel(SERVICE_UNAVAILABLE, serviceUnavailableErrorModel))
     (submittedGiftAidService.getSubmittedGiftAid(_: String, _: Int)(_: HeaderCarrier))
       .expects(*, *, *)
       .returning(Future.successful(invalidSubmittedGiftAid))

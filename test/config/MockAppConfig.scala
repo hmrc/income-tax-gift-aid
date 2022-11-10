@@ -16,12 +16,20 @@
 
 package config
 
-class MockAppConfig extends AppConfig {
+import org.scalamock.scalatest.MockFactory
+class MockAppConfig extends AppConfig with MockFactory {
 
-  override val authBaseUrl: String = "auth"
-  override val auditingEnabled: Boolean = false
-  override val graphiteHost: String = "localhost"
-  override val desBaseUrl: String = "des"
+  override val authBaseUrl: String = "/auth"
+
+  override val auditingEnabled: Boolean = true
+  override val graphiteHost: String = "/graphite"
+  override val desBaseUrl: String = "/des"
+
   override val environment: String = "dev"
   override val authorisationToken: String = "someToken"
+  override val authorisationTokenKey: String = "someToken"
+  override val ifBaseUrl: String = "/if"
+  override val ifEnvironment: String = "dev"
+
+  override def authorisationTokenFor(apiVersion: String): String = "someToken"
 }

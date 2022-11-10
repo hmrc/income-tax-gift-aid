@@ -18,26 +18,28 @@ package models
 
 import play.api.libs.json.{JsValue, Json, OFormat}
 
-sealed trait DesErrorBody
+sealed trait ErrorBody
 
-case class DesErrorModel(status: Int, body: DesErrorBody){
+case class ErrorModel(status: Int, body: ErrorBody){
   def toJson: JsValue ={
     body match {
-      case error: DesErrorBodyModel => Json.toJson(error)
-      case errors: DesErrorsBodyModel => Json.toJson(errors)
+      case error: ErrorBodyModel => Json.toJson(error)
+      case errors: ErrorsBodyModel => Json.toJson(errors)
     }
   }
 }
 
-case class DesErrorBodyModel(code: String, reason: String) extends DesErrorBody
+/** Single Error **/
+case class ErrorBodyModel(code: String, reason: String) extends ErrorBody
 
-object DesErrorBodyModel {
-  implicit val formats: OFormat[DesErrorBodyModel] = Json.format[DesErrorBodyModel]
-  val parsingError: DesErrorBodyModel = DesErrorBodyModel("PARSING_ERROR", "Error parsing response from DES")
+object ErrorBodyModel {
+  implicit val formats: OFormat[ErrorBodyModel] = Json.format[ErrorBodyModel]
+  val parsingError: ErrorBodyModel = ErrorBodyModel("PARSING_ERROR", "Error parsing response from API")
 }
 
-case class DesErrorsBodyModel(failures: Seq[DesErrorBodyModel]) extends DesErrorBody
+/** Multiple Errors **/
+case class ErrorsBodyModel(failures: Seq[ErrorBodyModel]) extends ErrorBody
 
-object DesErrorsBodyModel {
-  implicit val formats: OFormat[DesErrorsBodyModel] = Json.format[DesErrorsBodyModel]
+object ErrorsBodyModel {
+  implicit val formats: OFormat[ErrorsBodyModel] = Json.format[ErrorsBodyModel]
 }

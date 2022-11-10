@@ -17,7 +17,7 @@
 package controllers
 
 import models.submission._
-import models.{DesErrorBodyModel, DesErrorModel, DesErrorsBodyModel, GiftAidSubmissionResponseModel}
+import models.{ErrorBodyModel, ErrorModel, ErrorsBodyModel, GiftAidSubmissionResponseModel}
 import play.api.http.Status._
 import play.api.libs.json.Json
 import services.GiftAidSubmissionService
@@ -95,7 +95,7 @@ class GiftAidSubmissionControllerSpec extends UnitTest {
           mockAuth()
           (service.submit(_: String, _: Int, _: GiftAidSubmissionModel)(_: HeaderCarrier))
             .expects(*, *, *, *)
-            .returning(Future.successful(Left(DesErrorModel(IM_A_TEAPOT, DesErrorBodyModel("SUMET_WENT_RONG", "Dude can't spell")))))
+            .returning(Future.successful(Left(ErrorModel(IM_A_TEAPOT, ErrorBodyModel("SUMET_WENT_RONG", "Dude can't spell")))))
 
           controller.submit(nino, taxYear)(fakeRequest.withJsonBody(Json.toJson(submissionModel)))
         }
@@ -115,10 +115,10 @@ class GiftAidSubmissionControllerSpec extends UnitTest {
           mockAuth()
           (service.submit(_: String, _: Int, _: GiftAidSubmissionModel)(_: HeaderCarrier))
             .expects(*, *, *, *)
-            .returning(Future.successful(Left(DesErrorModel(IM_A_TEAPOT, DesErrorsBodyModel(
+            .returning(Future.successful(Left(ErrorModel(IM_A_TEAPOT, ErrorsBodyModel(
               Seq(
-                DesErrorBodyModel("NOOOOOOOO", "He was my father"),
-                DesErrorBodyModel("IM_UP_HERE", "I have the high ground")
+                ErrorBodyModel("NOOOOOOOO", "He was my father"),
+                ErrorBodyModel("IM_UP_HERE", "I have the high ground")
               )
             )))))
 

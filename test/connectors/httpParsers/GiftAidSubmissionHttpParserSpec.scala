@@ -18,7 +18,7 @@ package connectors.httpParsers
 
 import utils.UnitTest
 import connectors.httpParsers.GiftAidSubmissionHttpParser.CreateIncomeSourceHttpReads.read
-import models.{DesErrorBodyModel, DesErrorModel, GiftAidSubmissionResponseModel}
+import models.{ErrorBodyModel, ErrorModel, GiftAidSubmissionResponseModel}
 import uk.gov.hmrc.http.HttpResponse
 import play.api.http.Status._
 import play.api.libs.json.Json
@@ -55,56 +55,56 @@ class GiftAidSubmissionHttpParserSpec extends UnitTest {
         val invalidBody = Json.prettyPrint(Json.obj("malformed" -> "not-what-im-looking-for"))
         val result = read("POST", "/some-url", httpResponse(OK, invalidBody))
 
-        result shouldBe Left(DesErrorModel(INTERNAL_SERVER_ERROR, DesErrorBodyModel.parsingError))
+        result shouldBe Left(ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel.parsingError))
       }
 
       "the response status is NOT_FOUND" in {
         val errorBody = Json.prettyPrint(Json.obj("code" -> "NOT_FOUND", "reason" -> "Submission Period not found"))
         val result = read("POST", "/some-url", httpResponse(NOT_FOUND, errorBody))
 
-        result shouldBe Left(DesErrorModel(NOT_FOUND, DesErrorBodyModel("NOT_FOUND", "Submission Period not found")))
+        result shouldBe Left(ErrorModel(NOT_FOUND, ErrorBodyModel("NOT_FOUND", "Submission Period not found")))
       }
 
       "the response status is UNPROCESSABLE_ENTITY" in {
         val errorBody = Json.prettyPrint(Json.obj("code" -> "UNPROCESSABLE_ENTITY", "reason" -> "The remote endpoint has indicated that for given income source type, message payload is incorrect."))
         val result = read("POST", "/some-url", httpResponse(UNPROCESSABLE_ENTITY, errorBody))
 
-        result shouldBe Left(DesErrorModel(UNPROCESSABLE_ENTITY, DesErrorBodyModel("UNPROCESSABLE_ENTITY", "The remote endpoint has indicated that for given income source type, message payload is incorrect.")))
+        result shouldBe Left(ErrorModel(UNPROCESSABLE_ENTITY, ErrorBodyModel("UNPROCESSABLE_ENTITY", "The remote endpoint has indicated that for given income source type, message payload is incorrect.")))
       }
 
       "the response status is INTERNAL_SERVER_ERROR" in {
         val errorBody = Json.prettyPrint(Json.obj("code" -> "AWW_MAN", "reason" -> "not again"))
         val result = read("POST", "/some-url", httpResponse(INTERNAL_SERVER_ERROR, errorBody))
 
-        result shouldBe Left(DesErrorModel(INTERNAL_SERVER_ERROR, DesErrorBodyModel("AWW_MAN", "not again")))
+        result shouldBe Left(ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel("AWW_MAN", "not again")))
       }
 
       "the response status is SERVICE_UNAVAILABLE" in {
         val errorBody = Json.prettyPrint(Json.obj("code" -> "AWW_MAN", "reason" -> "not again"))
         val result = read("POST", "/some-url", httpResponse(SERVICE_UNAVAILABLE, errorBody))
 
-        result shouldBe Left(DesErrorModel(SERVICE_UNAVAILABLE, DesErrorBodyModel("AWW_MAN", "not again")))
+        result shouldBe Left(ErrorModel(SERVICE_UNAVAILABLE, ErrorBodyModel("AWW_MAN", "not again")))
       }
 
       "the response status is BAD_REQUEST" in {
         val errorBody = Json.prettyPrint(Json.obj("code" -> "AWW_MAN", "reason" -> "not again"))
         val result = read("POST", "/some-url", httpResponse(BAD_REQUEST, errorBody))
 
-        result shouldBe Left(DesErrorModel(BAD_REQUEST, DesErrorBodyModel("AWW_MAN", "not again")))
+        result shouldBe Left(ErrorModel(BAD_REQUEST, ErrorBodyModel("AWW_MAN", "not again")))
       }
 
       "the response status is FORBIDDEN" in {
         val errorBody = Json.prettyPrint(Json.obj("code" -> "AWW_MAN", "reason" -> "not again"))
         val result = read("POST", "/some-url", httpResponse(FORBIDDEN, errorBody))
 
-        result shouldBe Left(DesErrorModel(FORBIDDEN, DesErrorBodyModel("AWW_MAN", "not again")))
+        result shouldBe Left(ErrorModel(FORBIDDEN, ErrorBodyModel("AWW_MAN", "not again")))
       }
 
       "the response status is any other value" in {
         val errorBody = Json.prettyPrint(Json.obj("code" -> "IMMA_LITTLE_TEAPOT", "reason" -> "short and stout"))
         val result = read("POST", "/some-url", httpResponse(IM_A_TEAPOT, errorBody))
 
-        result shouldBe Left(DesErrorModel(INTERNAL_SERVER_ERROR, DesErrorBodyModel("IMMA_LITTLE_TEAPOT", "short and stout")))
+        result shouldBe Left(ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel("IMMA_LITTLE_TEAPOT", "short and stout")))
       }
 
     }

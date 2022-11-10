@@ -19,7 +19,7 @@ package connectors
 import com.github.tomakehurst.wiremock.http.HttpHeader
 import config.{AppConfig, BackendAppConfig}
 import models.giftAid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
-import models.{DesErrorBodyModel, DesErrorModel, DesErrorsBodyModel}
+import models.{ErrorBodyModel, ErrorModel, ErrorsBodyModel}
 import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
 import play.api.Configuration
 import play.api.http.Status._
@@ -97,9 +97,9 @@ class SubmittedGiftAidConnectorISpec extends IntegrationTest {
     }
 
     "DES Returns multiple errors" in {
-      val expectedResult = DesErrorModel(BAD_REQUEST, DesErrorsBodyModel(Seq(
-        DesErrorBodyModel("INVALID_IDTYPE","ID is invalid"),
-        DesErrorBodyModel("INVALID_IDTYPE_2","ID 2 is invalid"))))
+      val expectedResult = ErrorModel(BAD_REQUEST, ErrorsBodyModel(Seq(
+        ErrorBodyModel("INVALID_IDTYPE","ID is invalid"),
+        ErrorBodyModel("INVALID_IDTYPE_2","ID 2 is invalid"))))
 
       val responseBody = Json.obj(
         "failures" -> Json.arr(
@@ -122,7 +122,7 @@ class SubmittedGiftAidConnectorISpec extends IntegrationTest {
         "giftAidPayments" -> ""
       )
 
-      val expectedResult = DesErrorModel(INTERNAL_SERVER_ERROR, DesErrorBodyModel.parsingError)
+      val expectedResult = ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel.parsingError)
 
       stubGetWithResponseBody(s"/income-tax/nino/$nino/income-source/charity/annual/$taxYear", OK, invalidJson.toString())
       implicit val hc = HeaderCarrier()
@@ -132,7 +132,7 @@ class SubmittedGiftAidConnectorISpec extends IntegrationTest {
     }
 
     "return a NO_CONTENT" in {
-      val expectedResult = DesErrorModel(INTERNAL_SERVER_ERROR, DesErrorBodyModel.parsingError)
+      val expectedResult = ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel.parsingError)
 
       stubGetWithResponseBody(s"/income-tax/nino/$nino/income-source/charity/annual/$taxYear", NO_CONTENT, "{}")
       implicit val hc = HeaderCarrier()
@@ -146,7 +146,7 @@ class SubmittedGiftAidConnectorISpec extends IntegrationTest {
         "code" -> "INVALID_NINO",
         "reason" -> "Nino is invalid"
       )
-      val expectedResult = DesErrorModel(400, DesErrorBodyModel("INVALID_NINO", "Nino is invalid"))
+      val expectedResult = ErrorModel(400, ErrorBodyModel("INVALID_NINO", "Nino is invalid"))
 
       stubGetWithResponseBody(s"/income-tax/nino/$nino/income-source/charity/annual/$taxYear", BAD_REQUEST, responseBody.toString())
       implicit val hc = HeaderCarrier()
@@ -160,7 +160,7 @@ class SubmittedGiftAidConnectorISpec extends IntegrationTest {
         "code" -> "NOT_FOUND_INCOME_SOURCE",
         "reason" -> "Can't find income source"
       )
-      val expectedResult = DesErrorModel(404, DesErrorBodyModel("NOT_FOUND_INCOME_SOURCE", "Can't find income source"))
+      val expectedResult = ErrorModel(404, ErrorBodyModel("NOT_FOUND_INCOME_SOURCE", "Can't find income source"))
 
       stubGetWithResponseBody(s"/income-tax/nino/$nino/income-source/charity/annual/$taxYear", NOT_FOUND, responseBody.toString())
       implicit val hc = HeaderCarrier()
@@ -174,7 +174,7 @@ class SubmittedGiftAidConnectorISpec extends IntegrationTest {
         "code" -> "SERVER_ERROR",
         "reason" -> "Internal server error"
       )
-      val expectedResult = DesErrorModel(500, DesErrorBodyModel("SERVER_ERROR", "Internal server error"))
+      val expectedResult = ErrorModel(500, ErrorBodyModel("SERVER_ERROR", "Internal server error"))
 
       stubGetWithResponseBody(s"/income-tax/nino/$nino/income-source/charity/annual/$taxYear", INTERNAL_SERVER_ERROR, responseBody.toString())
       implicit val hc = HeaderCarrier()
@@ -188,7 +188,7 @@ class SubmittedGiftAidConnectorISpec extends IntegrationTest {
         "code" -> "SERVICE_UNAVAILABLE",
         "reason" -> "Service is unavailable"
       )
-      val expectedResult = DesErrorModel(503, DesErrorBodyModel("SERVICE_UNAVAILABLE", "Service is unavailable"))
+      val expectedResult = ErrorModel(503, ErrorBodyModel("SERVICE_UNAVAILABLE", "Service is unavailable"))
 
       stubGetWithResponseBody(s"/income-tax/nino/$nino/income-source/charity/annual/$taxYear", SERVICE_UNAVAILABLE, responseBody.toString())
       implicit val hc = HeaderCarrier()
@@ -198,7 +198,7 @@ class SubmittedGiftAidConnectorISpec extends IntegrationTest {
     }
 
     "return an Internal Server Error when DES throws an unexpected result" in {
-      val expectedResult = DesErrorModel(INTERNAL_SERVER_ERROR, DesErrorBodyModel.parsingError)
+      val expectedResult = ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel.parsingError)
 
       stubGetWithoutResponseBody(s"/income-tax/nino/$nino/income-source/charity/annual/$taxYear", NO_CONTENT)
       implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -212,7 +212,7 @@ class SubmittedGiftAidConnectorISpec extends IntegrationTest {
         "code" -> "SERVICE_UNAVAILABLE",
         "reason" -> "Service is unavailable"
       )
-      val expectedResult = DesErrorModel(INTERNAL_SERVER_ERROR,  DesErrorBodyModel("SERVICE_UNAVAILABLE", "Service is unavailable"))
+      val expectedResult = ErrorModel(INTERNAL_SERVER_ERROR,  ErrorBodyModel("SERVICE_UNAVAILABLE", "Service is unavailable"))
 
       stubGetWithResponseBody(s"/income-tax/nino/$nino/income-source/charity/annual/$taxYear", CONFLICT, responseBody.toString())
       implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -225,7 +225,7 @@ class SubmittedGiftAidConnectorISpec extends IntegrationTest {
       val responseBody = Json.obj(
         "code" -> "SERVICE_UNAVAILABLE"
       )
-      val expectedResult = DesErrorModel(INTERNAL_SERVER_ERROR,  DesErrorBodyModel.parsingError)
+      val expectedResult = ErrorModel(INTERNAL_SERVER_ERROR,  ErrorBodyModel.parsingError)
 
       stubGetWithResponseBody(s"/income-tax/nino/$nino/income-source/charity/annual/$taxYear", CONFLICT, responseBody.toString())
       implicit val hc: HeaderCarrier = HeaderCarrier()
