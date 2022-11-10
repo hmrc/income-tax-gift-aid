@@ -18,7 +18,7 @@ package connectors
 
 import com.github.tomakehurst.wiremock.http.HttpHeader
 import config.{AppConfig, BackendAppConfig}
-import models.{DesErrorBodyModel, DesErrorModel, DesErrorsBodyModel, GiftAidSubmissionResponseModel}
+import models.{ErrorBodyModel, ErrorModel, ErrorsBodyModel, GiftAidSubmissionResponseModel}
 import models.submission.GiftAidSubmissionModel
 import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
 import play.api.Configuration
@@ -102,7 +102,7 @@ class GiftAidSubmissionConnectorISpec extends IntegrationTest  {
         connector.submit(nino, taxYear, submissionModel)(emptyHeaderCarrier)
       }
 
-      await(result) shouldBe Left(DesErrorModel(INTERNAL_SERVER_ERROR, DesErrorBodyModel("oh-noes", "somethin' sank the ship")))
+      await(result) shouldBe Left(ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel("oh-noes", "somethin' sank the ship")))
     }
 
     "return multiple errors when des does so" in {
@@ -114,9 +114,9 @@ class GiftAidSubmissionConnectorISpec extends IntegrationTest  {
         connector.submit(nino, taxYear, submissionModel)(emptyHeaderCarrier)
       }
 
-      await(result) shouldBe Left(DesErrorModel(INTERNAL_SERVER_ERROR, DesErrorsBodyModel(Seq(
-        DesErrorBodyModel("oh-noes", "somethin' sank the ship"),
-        DesErrorBodyModel("wut", "but how?!")
+      await(result) shouldBe Left(ErrorModel(INTERNAL_SERVER_ERROR, ErrorsBodyModel(Seq(
+        ErrorBodyModel("oh-noes", "somethin' sank the ship"),
+        ErrorBodyModel("wut", "but how?!")
       ))))
     }
 

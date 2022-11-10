@@ -17,7 +17,7 @@
 package services
 
 import com.codahale.metrics.SharedMetricRegistries
-import connectors.SubmittedGiftAidConnector
+import connectors.{SubmittedGiftAidConnector, GetAnnualIncomeSourcePeriodConnector}
 import connectors.httpParsers.SubmittedGiftAidHttpParser.SubmittedGiftAidResponse
 import models.giftAid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -29,7 +29,8 @@ class SubmittedGiftAidServiceSpec extends UnitTest {
   SharedMetricRegistries.clear()
 
   val connector: SubmittedGiftAidConnector = mock[SubmittedGiftAidConnector]
-  val service: SubmittedGiftAidService = new SubmittedGiftAidService(connector)
+  val ifConnector: GetAnnualIncomeSourcePeriodConnector = mock[GetAnnualIncomeSourcePeriodConnector]
+  val service: SubmittedGiftAidService = new SubmittedGiftAidService(connector, ifConnector)
 
   val giftAidPayments: GiftAidPaymentsModel = GiftAidPaymentsModel(
     Some(List("")), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67)
@@ -43,10 +44,24 @@ class SubmittedGiftAidServiceSpec extends UnitTest {
       val expectedResult: SubmittedGiftAidResponse = Right(SubmittedGiftAidModel(Some(giftAidPayments), Some(gifts)))
 
       (connector.getSubmittedGiftAid(_: String, _: Int)(_: HeaderCarrier))
-        .expects("12345678", 1, *)
+        .expects("12345678", 1234, *)
         .returning(Future.successful(expectedResult))
 
-      val result = await(service.getSubmittedGiftAid("12345678", 1))
+      val result = await(service.getSubmittedGiftAid("12345678", 1234))
+
+      result shouldBe expectedResult
+
+    }
+
+    "return the IfConnector response" in {
+
+      val expectedResult: SubmittedGiftAidResponse = Right(SubmittedGiftAidModel(Some(giftAidPayments), Some(gifts)))
+
+      (ifConnector.getAnnualIncomeSourcePeriod(_: String, _: Int, _: Option[Boolean])(_: HeaderCarrier))
+        .expects("12345678", 2024, Some(false), *)
+        .returning(Future.successful(expectedResult))
+
+      val result = await(service.getSubmittedGiftAid("12345678", 2024))
 
       result shouldBe expectedResult
 
