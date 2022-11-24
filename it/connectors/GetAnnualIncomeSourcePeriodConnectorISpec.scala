@@ -27,6 +27,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, SessionId}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.IntegrationTest
+import utils.TaxYearUtils.convertSpecificTaxYear
 
 
 class GetAnnualIncomeSourcePeriodConnectorISpec extends IntegrationTest {
@@ -40,12 +41,8 @@ class GetAnnualIncomeSourcePeriodConnectorISpec extends IntegrationTest {
 
     val nino: String = "123456789"
 
-    def taxYearParameter(taxYear: Int): String = {
-      s"${taxYear - 1}-${taxYear.toString takeRight 2}"
-    }
-
     val taxYear: Int = 2024
-    val connectorTaxYear: String = taxYearParameter(2024)
+    val connectorTaxYear: String = convertSpecificTaxYear(taxYear)
     val giftAidResult: Option[BigDecimal] = Some(123456.78)
     val deletedPeriod: Option[Boolean] = Some(false)
     val url: String = s"/income-tax/$connectorTaxYear/$nino/income-source/charity/annual\\?deleteReturnPeriod=false"
