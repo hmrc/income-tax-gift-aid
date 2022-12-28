@@ -43,7 +43,7 @@ class DesConnectorSpec extends UnitTest {
       "add the correct environment" in {
         val hc = HeaderCarrier()
         val result = connector.headerCarrierTest(internalHost)(hc)
-        result.extraHeaders shouldBe List("Environment" -> mockAppConfig.environment)
+        result.extraHeaders shouldBe List("Environment" -> mockAppConfig.desEnvironment)
       }
     }
     "host is external" should {
@@ -56,7 +56,7 @@ class DesConnectorSpec extends UnitTest {
         result.extraHeaders.size mustBe 4
         result.extraHeaders.contains(xSessionId -> "sessionIdHeaderValue") mustBe true
         result.extraHeaders.contains(authorisation -> s"Bearer ${mockAppConfig.authorisationToken}") mustBe true
-        result.extraHeaders.contains("Environment" -> mockAppConfig.environment) mustBe true
+        result.extraHeaders.contains("Environment" -> mockAppConfig.desEnvironment) mustBe true
         result.extraHeaders.exists(x => x._1.equalsIgnoreCase(xRequestChain)) mustBe true
       }
     }

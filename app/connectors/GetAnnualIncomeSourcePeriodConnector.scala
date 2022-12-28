@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class GetAnnualIncomeSourcePeriodConnector @Inject()(val http: HttpClient,
                                                      val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
-
+  val GetAnnualIncomeSourcePeriod = "1785"
   def getAnnualIncomeSourcePeriod(nino: String,
                                   taxYear: Int,
                                   deletedPeriod: Option[Boolean])(implicit hc: HeaderCarrier): Future[GetAnnualIncomeSourcePeriod] = {

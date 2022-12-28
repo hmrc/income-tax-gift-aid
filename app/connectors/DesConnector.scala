@@ -37,7 +37,7 @@ trait DesConnector {
 
     val hcWithAuth = hc.copy(authorization = Some(Authorization(s"Bearer ${appConfig.authorisationToken}")))
 
-    val extraHeaders = Seq("Environment" -> appConfig.environment)
+    val extraHeaders = Seq("Environment" -> appConfig.desEnvironment)
 
     if (isInternalHost) {
       hcWithAuth.withExtraHeaders(extraHeaders: _*)

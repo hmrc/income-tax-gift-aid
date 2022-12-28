@@ -29,8 +29,9 @@ trait AppConfig {
   val graphiteHost: String
   val desBaseUrl: String
 
-  val environment: String
+  val desEnvironment: String
   val authorisationToken: String
+  val ifAuthorisationToken: String
   val authorisationTokenKey: String
   val ifBaseUrl: String
   val ifEnvironment: String
@@ -43,14 +44,15 @@ class BackendAppConfig @Inject()(config: Configuration, servicesConfig: Services
   val authBaseUrl: String = servicesConfig.baseUrl("auth")
 
   val auditingEnabled: Boolean = config.get[Boolean]("auditing.enabled")
-  val graphiteHost: String     = config.get[String]("microservice.metrics.graphite.host")
+  val graphiteHost: String = config.get[String]("microservice.metrics.graphite.host")
   val desBaseUrl: String = servicesConfig.baseUrl("des")
 
-  val environment: String = config.get[String]("microservice.services.des.environment")
+  val desEnvironment: String = config.get[String]("microservice.services.des.environment")
   val authorisationToken: String = config.get[String]("microservice.services.des.authorisation-token")
 
-  lazy val authorisationTokenKey: String = "microservice.services.integration-framework.authorisation-token"
   lazy val ifBaseUrl: String = servicesConfig.baseUrl(serviceName = "integration-framework")
+  lazy val ifAuthorisationToken: String = config.get[String]("microservice.services.integration-framework.authorisation-token")
+  lazy val authorisationTokenKey: String = "microservice.services.integration-framework.authorisation-token"
   lazy val ifEnvironment: String = servicesConfig.getString(key = "microservice.services.integration-framework.environment")
 
   def authorisationTokenFor(api: String): String = config.get[String](s"microservice.services.integration-framework.authorisation-token.$api")

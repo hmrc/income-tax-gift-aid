@@ -16,7 +16,7 @@
 
 package services
 
-import connectors.GiftAidSubmissionConnector
+import connectors.{CreateOrAmendAnnualIncomeSourcePeriodConnector, GiftAidSubmissionConnector}
 import connectors.httpParsers.GiftAidSubmissionHttpParser.GiftAidSubmissionResponse
 import models.submission.GiftAidSubmissionModel
 import uk.gov.hmrc.http.HeaderCarrier
@@ -24,10 +24,19 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class GiftAidSubmissionService @Inject()(connector: GiftAidSubmissionConnector) {
+class GiftAidSubmissionService @Inject()(connector: GiftAidSubmissionConnector,
+                                         ifConnector:CreateOrAmendAnnualIncomeSourcePeriodConnector) {
 
   def submit(nino: String, taxYear: Int, giftAidSubmissionModel: GiftAidSubmissionModel)(implicit hc: HeaderCarrier): Future[GiftAidSubmissionResponse] = {
-    connector.submit(nino, taxYear, giftAidSubmissionModel)(hc)
+    if(taxYear.equals(2024))
+      {
+        ifConnector.submit(nino, taxYear, giftAidSubmissionModel)
+      }
+    else
+      {
+        connector.submit(nino, taxYear, giftAidSubmissionModel)(hc)
+      }
+
   }
 
 }

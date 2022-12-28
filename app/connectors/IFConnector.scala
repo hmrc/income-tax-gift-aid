@@ -27,8 +27,7 @@ import java.net.URL
 trait IFConnector {
 
   protected val appConfig: AppConfig
-  protected[connectors] lazy val baseUrl: String = appConfig.ifBaseUrl
-  val GetAnnualIncomeSourcePeriod = "1785"
+  protected[connectors] lazy val baseUrl: String = if (appConfig.ifEnvironment == "test") appConfig.ifBaseUrl + "/if" else appConfig.ifBaseUrl
 
   protected val headerCarrierConfig: Config = HeaderCarrier.Config.fromConfig(ConfigFactory.load())
 
