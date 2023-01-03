@@ -16,19 +16,18 @@
 
 package connectors.httpParsers
 
-import utils.UnitTest
-import connectors.httpParsers.GiftAidSubmissionHttpParser.CreateIncomeSourceHttpReads.read
+import connectors.httpParsers.CreateOrAmendAnnualIncomeSourcePeriodHttpParser.CreateIncomeSourceHttpReads.read
 import models.{ErrorBodyModel, ErrorModel, GiftAidSubmissionResponseModel}
-import uk.gov.hmrc.http.HttpResponse
 import play.api.http.Status._
 import play.api.libs.json.Json
+import uk.gov.hmrc.http.HttpResponse
+import utils.UnitTest
 
-class GiftAidSubmissionHttpParserSpec extends UnitTest {
+class CreateOrAmendIncomeSourcePeriodHttpParserSpec extends UnitTest {
 
   def httpResponse(_status: Int, _body: String): HttpResponse = {
-    class SomeResponse(
-                        override val status: Int,
-                        override val body: String
+    class SomeResponse(override val status: Int,
+                       override val body: String
                       ) extends HttpResponse {
       override def allHeaders: Map[String, Seq[String]] = Map()
     }
@@ -49,7 +48,7 @@ class GiftAidSubmissionHttpParserSpec extends UnitTest {
 
     }
 
-    "a DES error" when {
+    "a IF error" when {
 
       "the response contains an OK, but a malformed body" in {
         val invalidBody = Json.prettyPrint(Json.obj("malformed" -> "not-what-im-looking-for"))
@@ -91,13 +90,6 @@ class GiftAidSubmissionHttpParserSpec extends UnitTest {
         val result = read("POST", "/some-url", httpResponse(BAD_REQUEST, errorBody))
 
         result shouldBe Left(ErrorModel(BAD_REQUEST, ErrorBodyModel("AWW_MAN", "not again")))
-      }
-
-      "the response status is FORBIDDEN" in {
-        val errorBody = Json.prettyPrint(Json.obj("code" -> "AWW_MAN", "reason" -> "not again"))
-        val result = read("POST", "/some-url", httpResponse(FORBIDDEN, errorBody))
-
-        result shouldBe Left(ErrorModel(FORBIDDEN, ErrorBodyModel("AWW_MAN", "not again")))
       }
 
       "the response status is any other value" in {

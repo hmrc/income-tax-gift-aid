@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package services
 
-import connectors.GiftAidSubmissionConnector
+import connectors.{CreateOrAmendAnnualIncomeSourcePeriodConnector, GiftAidSubmissionConnector}
 import models.GiftAidSubmissionResponseModel
 import models.submission.{GiftAidPaymentsModel, GiftAidSubmissionModel, GiftsModel}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -27,6 +27,7 @@ import scala.concurrent.Future
 class GiftAidSubmissionServiceSpec extends UnitTest {
   val nino = "AA123456A"
   val taxYear = 2021
+  val taxYear2024 = 2024
   val monetaryValue: BigDecimal = 123456.89
 
   val giftAidSubmissionModel: GiftAidSubmissionModel = GiftAidSubmissionModel(
@@ -35,8 +36,9 @@ class GiftAidSubmissionServiceSpec extends UnitTest {
   )
 
   val connector: GiftAidSubmissionConnector = mock[GiftAidSubmissionConnector]
+  val ifConnector: CreateOrAmendAnnualIncomeSourcePeriodConnector = mock[CreateOrAmendAnnualIncomeSourcePeriodConnector]
 
-  val service = new GiftAidSubmissionService(connector)
+  val service = new GiftAidSubmissionService(connector, ifConnector)
 
   val returnedObject = Right(GiftAidSubmissionResponseModel("some-transaction-id"))
 
@@ -50,6 +52,18 @@ class GiftAidSubmissionServiceSpec extends UnitTest {
       val result = await(service.submit(nino, taxYear, giftAidSubmissionModel))
 
       result shouldBe returnedObject
+    }
+
+    "return the IfConnector response" in {
+
+      (ifConnector.submit(_: String, _: Int, _: GiftAidSubmissionModel)(_: HeaderCarrier))
+        .expects(*, *, *, *)
+        .returning(Future.successful(returnedObject))
+
+      val result = await(service.submit(nino, taxYear2024, giftAidSubmissionModel))
+
+      result shouldBe returnedObject
+
     }
 
   }

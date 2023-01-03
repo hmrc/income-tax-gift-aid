@@ -16,37 +16,33 @@
 
 package connectors.httpParsers
 
-import models.giftAid.SubmittedGiftAidModel
-import models.ErrorModel
-import play.api.Logging
+import models.{ErrorModel, GiftAidSubmissionResponseModel}
 import play.api.http.Status._
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 import utils.PagerDutyHelper.PagerDutyKeys._
 import utils.PagerDutyHelper.pagerDutyLog
 
-object SubmittedGiftAidHttpParser extends APIParser with Logging {
-  type SubmittedGiftAidResponse = Either[ErrorModel, SubmittedGiftAidModel]
 
-  implicit object SubmittedGiftAidHttpReads extends HttpReads[SubmittedGiftAidResponse] {
+object CreateOrAmendAnnualIncomeSourcePeriodHttpParser extends APIParser {
+  type CreateOrAmendAnnualIncomeSourcePeriodResponse = Either[ErrorModel, GiftAidSubmissionResponseModel]
 
-    override def read(method: String, url: String, response: HttpResponse): SubmittedGiftAidResponse = {
+  implicit object CreateIncomeSourceHttpReads extends HttpReads[CreateOrAmendAnnualIncomeSourcePeriodResponse] {
+
+    override def read(method: String, url: String, response: HttpResponse): CreateOrAmendAnnualIncomeSourcePeriodResponse = {
       response.status match {
         case OK =>
-          response.json.validate[SubmittedGiftAidModel].fold[SubmittedGiftAidResponse](
-          jsonErrors => badSuccessJsonFromAPI,
-          parsedModel => Right(parsedModel)
-
-        )
+          Json.parse(response.body).validate[GiftAidSubmissionResponseModel].asOpt match {
+            case Some(model) => Right(model)
+            case None => badSuccessJsonFromAPI
+          }
         case INTERNAL_SERVER_ERROR =>
           pagerDutyLog(INTERNAL_SERVER_ERROR_FROM_API, logMessage(response))
           handleAPIError(response)
         case SERVICE_UNAVAILABLE =>
           pagerDutyLog(SERVICE_UNAVAILABLE_FROM_API, logMessage(response))
           handleAPIError(response)
-        case NOT_FOUND =>
-          logger.info(logMessage(response))
-          handleAPIError(response)
-        case BAD_REQUEST =>
+        case BAD_REQUEST | NOT_FOUND | UNPROCESSABLE_ENTITY =>
           pagerDutyLog(FOURXX_RESPONSE_FROM_API, logMessage(response))
           handleAPIError(response)
         case _ =>
@@ -54,5 +50,7 @@ object SubmittedGiftAidHttpParser extends APIParser with Logging {
           handleAPIError(response, Some(INTERNAL_SERVER_ERROR))
       }
     }
+
   }
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,12 @@ class MockAppConfig extends AppConfig with MockFactory {
   override val graphiteHost: String = "/graphite"
   override val desBaseUrl: String = "/des"
 
-  override val environment: String = "dev"
+  override val desEnvironment: String = "dev"
   override val authorisationToken: String = "someToken"
   override val authorisationTokenKey: String = "someToken"
   override val ifBaseUrl: String = "/if"
   override val ifEnvironment: String = "dev"
+  override val ifAuthorisationToken: String = "someToken"
 
   override def authorisationTokenFor(apiVersion: String): String = "someToken"
 }
