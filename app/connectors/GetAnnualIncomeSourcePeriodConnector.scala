@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class GetAnnualIncomeSourcePeriodConnector @Inject()(val http: HttpClient,
                                                      val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
-
+  val GetAnnualIncomeSourcePeriod = "1785"
   def getAnnualIncomeSourcePeriod(nino: String,
                                   taxYear: Int,
                                   deletedPeriod: Option[Boolean])(implicit hc: HeaderCarrier): Future[GetAnnualIncomeSourcePeriod] = {

@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package services
+package support.providers
 
-import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import config.AppConfig
+import support.stubs.AppConfigStub
 
-import javax.inject.{Inject, Singleton}
+trait AppConfigStubProvider {
 
-@Singleton
-class AuthService @Inject()(val authConnector: AuthConnector) extends AuthorisedFunctions
+  lazy val appConfigStub: AppConfig = new AppConfigStub().config()
+}
