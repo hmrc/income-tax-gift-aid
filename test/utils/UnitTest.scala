@@ -22,7 +22,6 @@ import com.codahale.metrics.SharedMetricRegistries
 import common.{EnrolmentIdentifiers, EnrolmentKeys}
 import config.{AppConfig, MockAppConfig}
 import controllers.predicates.AuthorisedAction
-import common.{EnrolmentIdentifiers, EnrolmentKeys}
 import org.scalamock.handlers.CallHandler4
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfterEach
