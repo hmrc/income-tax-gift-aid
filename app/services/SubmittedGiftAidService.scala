@@ -19,6 +19,7 @@ package services
 import connectors.{GetAnnualIncomeSourcePeriodConnector, SubmittedGiftAidConnector}
 import connectors.httpParsers.SubmittedGiftAidHttpParser.SubmittedGiftAidResponse
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.TaxYearUtils.specificTaxYear
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
@@ -27,7 +28,7 @@ import scala.concurrent.Future
 class SubmittedGiftAidService @Inject()(submittedGiftAidConnector: SubmittedGiftAidConnector,
                                         getAnnualIncomeSourcePeriodConnector: GetAnnualIncomeSourcePeriodConnector ) {
   def getSubmittedGiftAid(nino: String, taxYear: Int)(implicit hc: HeaderCarrier): Future[SubmittedGiftAidResponse] = {
-    if (taxYear.equals(2024)) {
+    if (taxYear >= specificTaxYear) {
       getAnnualIncomeSourcePeriodConnector.getAnnualIncomeSourcePeriod(nino, taxYear, Some(false))
     }
     else {

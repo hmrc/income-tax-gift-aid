@@ -17,16 +17,19 @@
 package services
 
 import com.codahale.metrics.SharedMetricRegistries
-import connectors.{SubmittedGiftAidConnector, GetAnnualIncomeSourcePeriodConnector}
+import connectors.{GetAnnualIncomeSourcePeriodConnector, SubmittedGiftAidConnector}
 import connectors.httpParsers.SubmittedGiftAidHttpParser.SubmittedGiftAidResponse
 import models.giftAid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.UnitTest
+import utils.{TaxYearUtils, UnitTest}
 
 import scala.concurrent.Future
 
 class SubmittedGiftAidServiceSpec extends UnitTest {
   SharedMetricRegistries.clear()
+
+  val specificTaxYear: Int = TaxYearUtils.specificTaxYear
+  val specificTaxYearPlusOne: Int = specificTaxYear + 1
 
   val connector: SubmittedGiftAidConnector = mock[SubmittedGiftAidConnector]
   val ifConnector: GetAnnualIncomeSourcePeriodConnector = mock[GetAnnualIncomeSourcePeriodConnector]
@@ -53,15 +56,29 @@ class SubmittedGiftAidServiceSpec extends UnitTest {
 
     }
 
-    "return the IfConnector response" in {
+    "return the IfConnector response for specific tax year" in {
 
       val expectedResult: SubmittedGiftAidResponse = Right(SubmittedGiftAidModel(Some(giftAidPayments), Some(gifts)))
 
       (ifConnector.getAnnualIncomeSourcePeriod(_: String, _: Int, _: Option[Boolean])(_: HeaderCarrier))
-        .expects("12345678", 2024, Some(false), *)
+        .expects("12345678", specificTaxYear, Some(false), *)
         .returning(Future.successful(expectedResult))
 
-      val result = await(service.getSubmittedGiftAid("12345678", 2024))
+      val result = await(service.getSubmittedGiftAid("12345678", specificTaxYear))
+
+      result shouldBe expectedResult
+
+    }
+
+    "return the IfConnector response for specific tax year plus one" in {
+
+      val expectedResult: SubmittedGiftAidResponse = Right(SubmittedGiftAidModel(Some(giftAidPayments), Some(gifts)))
+
+      (ifConnector.getAnnualIncomeSourcePeriod(_: String, _: Int, _: Option[Boolean])(_: HeaderCarrier))
+        .expects("12345678", specificTaxYearPlusOne, Some(false), *)
+        .returning(Future.successful(expectedResult))
+
+      val result = await(service.getSubmittedGiftAid("12345678", specificTaxYearPlusOne))
 
       result shouldBe expectedResult
 
