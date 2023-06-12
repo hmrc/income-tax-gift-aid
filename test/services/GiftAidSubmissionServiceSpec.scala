@@ -20,14 +20,15 @@ import connectors.{CreateOrAmendAnnualIncomeSourcePeriodConnector, GiftAidSubmis
 import models.GiftAidSubmissionResponseModel
 import models.submission.{GiftAidPaymentsModel, GiftAidSubmissionModel, GiftsModel}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.UnitTest
+import utils.{TaxYearUtils, UnitTest}
 
 import scala.concurrent.Future
 
 class GiftAidSubmissionServiceSpec extends UnitTest {
   val nino = "AA123456A"
   val taxYear = 2021
-  val taxYear2024 = 2024
+  val specificTaxYear: Int = TaxYearUtils.specificTaxYear
+  val specificTaxYearPlusOne: Int = specificTaxYear + 1
   val monetaryValue: BigDecimal = 123456.89
 
   val giftAidSubmissionModel: GiftAidSubmissionModel = GiftAidSubmissionModel(
@@ -54,13 +55,25 @@ class GiftAidSubmissionServiceSpec extends UnitTest {
       result shouldBe returnedObject
     }
 
-    "return the IfConnector response" in {
+    "return the IfConnector response for specific tax year" in {
 
       (ifConnector.submit(_: String, _: Int, _: GiftAidSubmissionModel)(_: HeaderCarrier))
         .expects(*, *, *, *)
         .returning(Future.successful(returnedObject))
 
-      val result = await(service.submit(nino, taxYear2024, giftAidSubmissionModel))
+      val result = await(service.submit(nino, specificTaxYear, giftAidSubmissionModel))
+
+      result shouldBe returnedObject
+
+    }
+
+    "return the IfConnector response for specific tax year plus one" in {
+
+      (ifConnector.submit(_: String, _: Int, _: GiftAidSubmissionModel)(_: HeaderCarrier))
+        .expects(*, *, *, *)
+        .returning(Future.successful(returnedObject))
+
+      val result = await(service.submit(nino, specificTaxYearPlusOne, giftAidSubmissionModel))
 
       result shouldBe returnedObject
 

@@ -26,7 +26,7 @@ import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, SessionId}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import utils.IntegrationTest
+import utils.{IntegrationTest, TaxYearUtils}
 import utils.TaxYearUtils.convertSpecificTaxYear
 
 class CreateOrAmendIncomeSourcePeriodConnectorISpec extends IntegrationTest {
@@ -40,10 +40,12 @@ class CreateOrAmendIncomeSourcePeriodConnectorISpec extends IntegrationTest {
   }
 
   val nino: String = "AA123456A"
-  val taxYear: Int = 2024
-  val taxYearParameter: String = convertSpecificTaxYear(taxYear)
+  val specificTaxYear: Int = TaxYearUtils.specificTaxYear
+  val specificTaxYearPlusOne: Int = specificTaxYear + 1
+  val taxYearParameter: String = convertSpecificTaxYear(specificTaxYear)
+  val taxYearParameterPlusOne: String = convertSpecificTaxYear(specificTaxYearPlusOne)
   val url = s"/income-tax/$taxYearParameter/$nino/income-source/charity/annual"
-
+  val urlPlusOne = s"/income-tax/$taxYearParameterPlusOne/$nino/income-source/charity/annual"
   val submissionModel: GiftAidSubmissionModel = GiftAidSubmissionModel(None, None)
 
   ".submit" should {
@@ -64,7 +66,7 @@ class CreateOrAmendIncomeSourcePeriodConnectorISpec extends IntegrationTest {
 
         stubPostWithResponseBody(url, OK, requestBody, responseBody, headersSentToIF)
 
-        val result = await(connector.submit(nino, taxYear, submissionModel)(hc))
+        val result = await(connector.submit(nino, specificTaxYear, submissionModel)(hc))
 
         result mustBe Right(GiftAidSubmissionResponseModel("im-an-id-yay"))
       }
@@ -76,22 +78,37 @@ class CreateOrAmendIncomeSourcePeriodConnectorISpec extends IntegrationTest {
 
         stubPostWithResponseBody(url, OK, requestBody, responseBody, headersSentToIF)
 
-        val result = await(connector.submit(nino, taxYear, submissionModel)(hc))
+        val result = await(connector.submit(nino, specificTaxYear, submissionModel)(hc))
 
         result mustBe Right(GiftAidSubmissionResponseModel("im-an-id-yay"))
       }
     }
 
-    "return a response model with the data IF returns" in {
-      val expectedBody: String = Json.stringify(Json.toJson(submissionModel))
-      val responseBody: String = Json.stringify(Json.toJson(GiftAidSubmissionResponseModel("im-an-id-yay")))
+    "return a success response" when {
 
-      val result = {
-        stubPostWithResponseBody(url, OK, expectedBody, responseBody)
-        connector.submit(nino, taxYear, submissionModel)(emptyHeaderCarrier)
+      "IF returns a 200 for specific tax year" in {
+        val expectedBody: String = Json.stringify(Json.toJson(submissionModel))
+        val responseBody: String = Json.stringify(Json.toJson(GiftAidSubmissionResponseModel("im-an-id-yay")))
+
+        val result = {
+          stubPostWithResponseBody(url, OK, expectedBody, responseBody)
+          connector.submit(nino, specificTaxYear, submissionModel)(emptyHeaderCarrier)
+        }
+
+        await(result) shouldBe Right(GiftAidSubmissionResponseModel("im-an-id-yay"))
       }
 
-      await(result) shouldBe Right(GiftAidSubmissionResponseModel("im-an-id-yay"))
+      "IF returns a 200 for specific tax year plus one" in {
+        val expectedBody: String = Json.stringify(Json.toJson(submissionModel))
+        val responseBody: String = Json.stringify(Json.toJson(GiftAidSubmissionResponseModel("im-an-id-yay")))
+
+        val result = {
+          stubPostWithResponseBody(urlPlusOne, OK, expectedBody, responseBody)
+          connector.submit(nino, specificTaxYearPlusOne, submissionModel)(emptyHeaderCarrier)
+        }
+
+        await(result) shouldBe Right(GiftAidSubmissionResponseModel("im-an-id-yay"))
+      }
     }
 
     "return an error model when IF returns an error" in {
@@ -100,7 +117,7 @@ class CreateOrAmendIncomeSourcePeriodConnectorISpec extends IntegrationTest {
 
       val result = {
         stubPostWithResponseBody(url, INTERNAL_SERVER_ERROR, expectedBody, responseBody)
-        connector.submit(nino, taxYear, submissionModel)(emptyHeaderCarrier)
+        connector.submit(nino, specificTaxYear, submissionModel)(emptyHeaderCarrier)
       }
 
       await(result) shouldBe Left(ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel("oh-noes", "somethin' sank the ship")))
@@ -112,7 +129,7 @@ class CreateOrAmendIncomeSourcePeriodConnectorISpec extends IntegrationTest {
 
       val result = {
         stubPostWithResponseBody(url, INTERNAL_SERVER_ERROR, expectedBody, responseBody)
-        connector.submit(nino, taxYear, submissionModel)(emptyHeaderCarrier)
+        connector.submit(nino, specificTaxYear, submissionModel)(emptyHeaderCarrier)
       }
 
       await(result) shouldBe Left(ErrorModel(INTERNAL_SERVER_ERROR, ErrorsBodyModel(Seq(

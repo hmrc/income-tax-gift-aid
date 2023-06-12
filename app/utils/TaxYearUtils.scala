@@ -20,6 +20,8 @@ import play.api.Logging
 
 object TaxYearUtils extends Logging {
 
+  val specificTaxYear: Int = 2024
+
   def convertSpecificTaxYear(taxYear: Int): String =
     s"${(taxYear - 1).toString takeRight 2}-${taxYear.toString takeRight 2}"
 }
