@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HeaderCarrier.Config
 import uk.gov.hmrc.http.Authorization
 import utils.HeaderCarrierSyntax.HeaderCarrierSyntax
+import models.logging.CorrelationId.CorrelationIdHeaderKey
 
 import java.net.URL
 
@@ -36,8 +37,8 @@ trait DesConnector {
     val isInternalHost = headerCarrierConfig.internalHostPatterns.exists(_.pattern.matcher(new URL(url).getHost).matches())
 
     val hcWithAuth = hc.copy(authorization = Some(Authorization(s"Bearer ${appConfig.authorisationToken}")))
-
-    val extraHeaders = Seq("Environment" -> appConfig.desEnvironment)
+    val correlationId: Seq[(String, String)] = hc.maybeCorrelationId.map(id => CorrelationIdHeaderKey -> id).toList
+    val extraHeaders: Seq[(String, String)] = Seq("Environment" -> appConfig.desEnvironment) ++ correlationId
 
     if (isInternalHost) {
       hcWithAuth.withExtraHeaders(extraHeaders: _*)

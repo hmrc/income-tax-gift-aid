@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{affinityGroup, allEnrolment
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-
+import models.logging.CorrelationIdMdc.withEnrichedCorrelationId
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthorisedAction @Inject()()(implicit val authConnector: AuthConnector,
@@ -40,26 +40,27 @@ class AuthorisedAction @Inject()()(implicit val authConnector: AuthConnector,
   val unauthorized: Future[Result] = Future(Unauthorized)
 
   def async(block: User[AnyContent] => Future[Result]): Action[AnyContent] = defaultActionBuilder.async { implicit request =>
+    withEnrichedCorrelationId(request) { request =>
+      implicit lazy val headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
 
-    implicit lazy val headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
-
-    request.headers.get("mtditid").fold {
-      logger.warn("[AuthorisedAction][async] - No MTDITID in the header. Returning unauthorised.")
-      unauthorized
-    }(
-      mtdItId =>
-        authorised().retrieve(affinityGroup) {
-          case Some(AffinityGroup.Agent) => agentAuthentication(block, mtdItId)(request, headerCarrier)
-          case _ => individualAuthentication(block, mtdItId)(request, headerCarrier)
-        } recover {
-          case _: NoActiveSession =>
-            logger.info(s"[AuthorisedAction][async] - No active session.")
-            Unauthorized
-          case _: AuthorisationException =>
-            logger.info(s"[AuthorisedAction][async] - User failed to authenticate")
-            Unauthorized
-        }
-    )
+      request.headers.get("mtditid").fold {
+        logger.warn("[AuthorisedAction][async] - No MTDITID in the header. Returning unauthorised.")
+        unauthorized
+      }(
+        mtdItId =>
+          authorised().retrieve(affinityGroup) {
+            case Some(AffinityGroup.Agent) => agentAuthentication(block, mtdItId)(request, headerCarrier)
+            case _ => individualAuthentication(block, mtdItId)(request, headerCarrier)
+          } recover {
+            case _: NoActiveSession =>
+              logger.info(s"[AuthorisedAction][async] - No active session.")
+              Unauthorized
+            case _: AuthorisationException =>
+              logger.info(s"[AuthorisedAction][async] - User failed to authenticate")
+              Unauthorized
+          }
+      )
+    }
   }
 
   val minimumConfidenceLevel: Int = ConfidenceLevel.L250.level
