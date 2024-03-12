@@ -28,6 +28,8 @@ object PagerDutyHelper extends Logging {
     val UNEXPECTED_RESPONSE_FROM_API: PagerDutyKeys.Value = Value
     val FOURXX_RESPONSE_FROM_API: PagerDutyKeys.Value = Value
     val UNPROCESSABLE_ENTITY_FROM_API: PagerDutyKeys.Value = Value
+    val UNAUTHORIZED_RESPONSE_FROM_API: PagerDutyKeys.Value = Value
+
   }
 
   def pagerDutyLog(pagerDutyKey: PagerDutyKeys.Value, otherDetail: String = ""): Unit = {

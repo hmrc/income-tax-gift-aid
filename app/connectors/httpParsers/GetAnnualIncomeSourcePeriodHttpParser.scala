@@ -31,10 +31,9 @@ object GetAnnualIncomeSourcePeriodHttpParser extends APIParser with Logging {
 
       override def read(method: String, url: String, response: HttpResponse): GetAnnualIncomeSourcePeriod = {
         response.status match {
-          case OK => response.json.validate[SubmittedGiftAidModel].fold[GetAnnualIncomeSourcePeriod](
-            jsonErrors => badSuccessJsonFromAPI,
-            parsedModel => Right(parsedModel)
-          )
+          case OK =>
+            response.json.validate[SubmittedGiftAidModel].fold[GetAnnualIncomeSourcePeriod](
+            jsonErrors => badSuccessJsonFromAPI, parsedModel => Right(parsedModel))
           case INTERNAL_SERVER_ERROR =>
             pagerDutyLog(INTERNAL_SERVER_ERROR_FROM_API, logMessage(response))
             handleAPIError(response)
@@ -47,11 +46,12 @@ object GetAnnualIncomeSourcePeriodHttpParser extends APIParser with Logging {
           case NOT_FOUND =>
             logger.info(logMessage(response))
             handleAPIError(response)
-          case BAD_REQUEST =>
-            pagerDutyLog(FOURXX_RESPONSE_FROM_API, logMessage(response))
-            handleAPIError(response)
+          case UNAUTHORIZED =>
+            pagerDutyLog(UNAUTHORIZED_RESPONSE_FROM_API, logMessage(response))
+            //This scenario is missing in spec.But we do get 401 from downstream, convert to internal server error?
+            handleAPIError(response, Some(INTERNAL_SERVER_ERROR))
           case _ =>
-            pagerDutyLog(UNEXPECTED_RESPONSE_FROM_API, logMessage(response))
+            pagerDutyLog(UNEXPECTED_RESPONSE_FROM_API)
             handleAPIError(response, Some(INTERNAL_SERVER_ERROR))
         }
       }

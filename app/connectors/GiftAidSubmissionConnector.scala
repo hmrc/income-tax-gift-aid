@@ -27,7 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class GiftAidSubmissionConnector @Inject()(val appConfig: AppConfig,
                                            http: HttpClient
                                           )(implicit executionContext: ExecutionContext) extends DesConnector {
-
+  //API#1390
   def submit(nino: String, taxYear: Int, submissionModel: GiftAidSubmissionModel
             )(implicit hc: HeaderCarrier): Future[GiftAidSubmissionResponse] = {
 
