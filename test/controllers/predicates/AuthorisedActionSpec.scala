@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -198,7 +198,7 @@ class AuthorisedActionSpec extends UnitTest {
               .expects(*, *, *, *)
               .returning(Future.successful(enrolments))
 
-            auth.agentAuthentication(block,"1234567890")(fakeRequest, emptyHeaderCarrier)
+            auth.agentAuthentication(block, "1234567890")(fakeRequest, emptyHeaderCarrier)
           }
 
           "has a status of OK" in {
@@ -218,7 +218,7 @@ class AuthorisedActionSpec extends UnitTest {
 
           lazy val result = {
             mockAuthReturnException(AuthException)
-            auth.agentAuthentication(block,"1234567890")(fakeRequest, emptyHeaderCarrier)
+            auth.agentAuthentication(block, "1234567890")(fakeRequest, emptyHeaderCarrier)
           }
           status(result) shouldBe UNAUTHORIZED
         }
