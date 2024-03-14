@@ -15,7 +15,6 @@
  */
 
 import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "income-tax-gift-aid"
 
@@ -53,10 +52,10 @@ lazy val microservice = Project(appName, file("."))
   )
   .settings(
     majorVersion := 0,
-    scalaVersion := "2.13.10",
+    scalaVersion := "2.13.12",
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
+    scalacOptions += "-Wconf:src=routes/.*:s"
   )
-  .settings(publishingSettings: _*)
   .configs(IntegrationTest)
   .settings(PlayKeys.playDefaultPort := 9316)
   .settings(integrationTestSettings(): _*)

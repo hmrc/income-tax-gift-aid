@@ -46,6 +46,9 @@ object GetAnnualIncomeSourcePeriodHttpParser extends APIParser with Logging {
           case NOT_FOUND =>
             logger.info(logMessage(response))
             handleAPIError(response)
+          case BAD_REQUEST =>
+            pagerDutyLog(FOURXX_RESPONSE_FROM_API, logMessage(response))
+            handleAPIError(response)
           case UNAUTHORIZED =>
             pagerDutyLog(UNAUTHORIZED_RESPONSE_FROM_API, logMessage(response))
             //This scenario is missing in spec.But we do get 401 from downstream, convert to internal server error?

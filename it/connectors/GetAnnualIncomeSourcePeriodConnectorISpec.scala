@@ -268,5 +268,19 @@ class GetAnnualIncomeSourcePeriodConnectorISpec extends IntegrationTest {
 
         result mustBe Left(expectedResult)
       }
+
+      "return an Internal Server Error when IF throws an unauthorised error" in {
+        val responseBody = Json.obj(
+          "code" -> "SERVER_ERROR",
+          "reason" -> "Internal server error"
+        )
+        val expectedResult = ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel("SERVER_ERROR", "Internal server error"))
+
+        stubGetWithResponseBody(url, UNAUTHORIZED, responseBody.toString())
+        implicit val hc: HeaderCarrier = HeaderCarrier()
+        val result = await(connector.getAnnualIncomeSourcePeriod(nino, specificTaxYear, deletedPeriod)(hc))
+
+        result mustBe Left(expectedResult)
+      }
     }
   }
