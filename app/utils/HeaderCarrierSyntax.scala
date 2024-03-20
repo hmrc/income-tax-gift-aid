@@ -16,7 +16,6 @@
 
 package utils
 
-//import models.logging.CorrelationId
 import models.logging.CorrelationId
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
 
