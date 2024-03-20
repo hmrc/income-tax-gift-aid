@@ -36,7 +36,7 @@ trait IFConnector {
     val isInternalHost = headerCarrierConfig.internalHostPatterns.exists(_.pattern.matcher(new URL(url).getHost).matches())
     val hcWithAuth = hc.copy(authorization = Some(Authorization(s"Bearer ${appConfig.authorisationTokenFor(apiVersion)}")))
     val correlationId: Seq[(String, String)] = hc.maybeCorrelationId.map(id => CorrelationIdHeaderKey -> id).toList
-    val extraHeaders: Seq[(String, String)] = Seq("Environment" -> appConfig.desEnvironment) ++ correlationId
+    val extraHeaders: Seq[(String, String)] = Seq("Environment" -> appConfig.ifEnvironment) ++ correlationId
 
     if (isInternalHost) {
       hcWithAuth.withExtraHeaders(extraHeaders: _*)
