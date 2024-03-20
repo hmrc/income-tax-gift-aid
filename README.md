@@ -6,18 +6,25 @@ This is where we  make API calls from users for creating, viewing and updating t
 ### Running the service locally
 
 You will need to have the following:
-- Installed/configured [service manager](https://github.com/hmrc/service-manager).
+- Installed/configured [service manager v2](https://github.com/hmrc/sm2).
 
 The service manager profile is:
 
-    sm --start INCOME_TAX_GIFT_AID
+    sm2 --start INCOME_TAX_GIFT_AID
 
 Run the following command to start the remaining services locally:
 
     sudo mongod (If not already running)
-    sm --start INCOME_TAX_SUBMISSION_ALL -r
+    sm2 --start INCOME_TAX_SUBMISSION_ALL -r
 
 This service runs on port: `localhost:9316`
+
+### Running Tests
+- Run Unit Tests:  `sbt test`
+- Run Integration Tests: `sbt it/test`
+- Run Unit and Integration Tests: `sbt test it/test`
+- Run Unit and Integration Tests with coverage report: `sbt runAllChecks`<br/>
+  which runs `clean compile scalastyle coverage test it/test coverageReport`
 
 ### Gift-aid endpoints:
 
@@ -62,8 +69,8 @@ All donations to charity data is retrieved/updated via the downstream system:
 
 ## Ninos with stubbed data for gift-aid
 
-| Nino | Gift-aid data |
-| ---  | ---            |
+| Nino      | Gift-aid data           |
+|-----------|-------------------------|
 | AA123459A | User with gift-aid data |
 | AA637489D | User with gift-aid data |
 
