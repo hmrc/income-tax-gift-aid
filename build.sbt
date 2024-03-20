@@ -50,7 +50,10 @@ lazy val microservice = Project(appName, file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .settings(
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
-    scalacOptions += "-Wconf:cat=unused-imports&src=routes/.*:s"
+    scalacOptions ++= Seq(
+      "-Wconf:cat=unused-imports&src=.*routes.*:s",
+      "-Wconf:cat=unused&src=.*routes.*:s"
+    )
   )
   .settings(PlayKeys.playDefaultPort := 9316)
   .settings(resolvers += Resolver.jcenterRepo)
