@@ -29,7 +29,6 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.{IntegrationTest, TaxYearUtils}
 import utils.TaxYearUtils.convertSpecificTaxYear
 
-
 class GetAnnualIncomeSourcePeriodConnectorISpec extends IntegrationTest {
 
   lazy val connector: GetAnnualIncomeSourcePeriodConnector = app.injector.instanceOf[GetAnnualIncomeSourcePeriodConnector]
