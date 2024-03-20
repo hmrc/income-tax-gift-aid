@@ -17,12 +17,15 @@
 package connectors
 
 import config.AppConfig
+import models.logging.CorrelationId.CorrelationIdHeaderKey
 import org.scalamock.scalatest.MockFactory
 import support.providers.AppConfigStubProvider
 import support.stubs.AppConfigStub
 import testUtils.TestSuite
 import uk.gov.hmrc.http.HeaderNames._
 import uk.gov.hmrc.http.{Authorization, HeaderCarrier, SessionId}
+
+import java.util.UUID
 
 class IFConnectorSpec extends TestSuite
   with MockFactory
@@ -62,14 +65,16 @@ class IFConnectorSpec extends TestSuite
 
     "return correct HeaderCarrier when external host" in {
       val externalHost = "http://127.0.0.1"
+      val correlationId = UUID.randomUUID().toString
       val hc = HeaderCarrier(sessionId = Some(SessionId("sessionIdHeaderValue")))
 
-      val result = underTest.ifHeaderCarrier(externalHost, "some-api-version")(hc)
+      val result = underTest.ifHeaderCarrier(externalHost, "some-api-version")(hc.withExtraHeaders(CorrelationIdHeaderKey -> correlationId))
 
-      result.extraHeaders.size mustBe 4
+      result.extraHeaders.size mustBe 5
       result.extraHeaders.contains(xSessionId -> "sessionIdHeaderValue") mustBe true
       result.extraHeaders.contains(authorisation -> s"Bearer ${appConfigStub.authorisationTokenFor("some-api-version")}") mustBe true
       result.extraHeaders.contains("Environment" -> appConfigStub.ifEnvironment) mustBe true
+      result.extraHeaders.contains(CorrelationIdHeaderKey -> correlationId) mustBe true
       result.extraHeaders.exists(x => x._1.equalsIgnoreCase(xRequestChain)) mustBe true
     }
   }

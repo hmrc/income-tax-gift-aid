@@ -16,6 +16,7 @@
 
 package utils
 
+//import models.logging.CorrelationId
 import models.logging.CorrelationId
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
 
@@ -35,8 +36,7 @@ object HeaderCarrierSyntax {
         HeaderNames.googleAnalyticTokenId     -> hc.gaToken,
         HeaderNames.googleAnalyticUserId      -> hc.gaUserId,
         HeaderNames.deviceID                  -> hc.deviceID,
-        HeaderNames.akamaiReputation          -> hc.akamaiReputation.map(_.value),
-        CorrelationId.CorrelationIdHeaderKey  -> maybeCorrelationId
+        HeaderNames.akamaiReputation          -> hc.akamaiReputation.map(_.value)
       ).collect { case (k, Some(v)) => (k, v) }
     }
 
