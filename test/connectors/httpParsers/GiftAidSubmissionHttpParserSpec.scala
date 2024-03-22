@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,13 @@ package connectors.httpParsers
 
 import utils.UnitTest
 import connectors.httpParsers.GiftAidSubmissionHttpParser.CreateIncomeSourceHttpReads.read
+import models.logging.CorrelationId.CorrelationIdHeaderKey
 import models.{ErrorBodyModel, ErrorModel, GiftAidSubmissionResponseModel}
 import uk.gov.hmrc.http.HttpResponse
 import play.api.http.Status._
 import play.api.libs.json.Json
+
+import java.util.UUID
 
 class GiftAidSubmissionHttpParserSpec extends UnitTest {
 
@@ -107,7 +110,13 @@ class GiftAidSubmissionHttpParserSpec extends UnitTest {
         result shouldBe Left(ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel("IMMA_LITTLE_TEAPOT", "short and stout")))
       }
 
+      "log at level ERROR with message the response status is INTERNAL_SERVER_ERROR" in{
+        val headers:Map[String, Seq[String]] = Map(CorrelationIdHeaderKey -> Seq(UUID.randomUUID().toString))
+        val errorBody = Json.prettyPrint(Json.obj("code" -> "AWW_MAN", "reason" -> "not again"))
+        val result = read("POST", "/some-url", HttpResponse(INTERNAL_SERVER_ERROR, errorBody, headers))
+
+        result shouldBe Left(ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel("AWW_MAN", "not again")))
+      }
     }
   }
-
 }

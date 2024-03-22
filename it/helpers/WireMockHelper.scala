@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, delete, equal
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 
 trait WireMockHelper {
@@ -37,7 +38,7 @@ trait WireMockHelper {
   def servicesToUrlConfig: Seq[(String, String)] = connectedServices
     .map(service => s"microservice.services.$service.base-url" -> s"http://localhost:$wiremockPort")
 
-  implicit lazy val app = GuiceApplicationBuilder()
+  implicit lazy val app: Application = GuiceApplicationBuilder()
     .configure(
       ("auditing.consumer.baseUri.port" -> wiremockPort) +:
         servicesToUrlConfig: _*

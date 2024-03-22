@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package connectors
 
 import com.typesafe.config.ConfigFactory
 import config.AppConfig
+import models.logging.CorrelationId.CorrelationIdHeaderKey
 import uk.gov.hmrc.http.HeaderCarrier.Config
 import uk.gov.hmrc.http.{Authorization, HeaderCarrier}
 import utils.HeaderCarrierSyntax.HeaderCarrierSyntax
@@ -34,11 +35,13 @@ trait IFConnector {
   protected[connectors] def ifHeaderCarrier(url: String, apiVersion: String)(implicit hc: HeaderCarrier): HeaderCarrier = {
     val isInternalHost = headerCarrierConfig.internalHostPatterns.exists(_.pattern.matcher(new URL(url).getHost).matches())
     val hcWithAuth = hc.copy(authorization = Some(Authorization(s"Bearer ${appConfig.authorisationTokenFor(apiVersion)}")))
+    val correlationId: Seq[(String, String)] = hc.maybeCorrelationId.map(id => CorrelationIdHeaderKey -> id).toList
+    val extraHeaders: Seq[(String, String)] = Seq("Environment" -> appConfig.ifEnvironment) ++ correlationId
 
     if (isInternalHost) {
-      hcWithAuth.withExtraHeaders(headers = "Environment" -> appConfig.ifEnvironment)
+      hcWithAuth.withExtraHeaders(extraHeaders: _*)
     } else {
-      hcWithAuth.withExtraHeaders(("Environment" -> appConfig.ifEnvironment) +: hcWithAuth.addExplicitHeaders: _*)
+      hcWithAuth.withExtraHeaders(extraHeaders ++ hcWithAuth.addExplicitHeaders: _*)
     }
   }
 }
