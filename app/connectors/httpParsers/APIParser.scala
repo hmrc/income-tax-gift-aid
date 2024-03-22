@@ -31,8 +31,11 @@ trait APIParser extends Logging {
   }
 
   def logCorrelationId(response: HttpResponse): Unit = {
-    val correlationIdToLog = response.header(CorrelationIdHeaderKey).getOrElse("No CorrelationId in response")
-    logger.info(s"Received $correlationIdToLog from downstream")
+    response.header(CorrelationIdHeaderKey) match {
+      case Some(v)  => logger.info(s"Response with correlationId $v :: Received status ${response.status} from downstream")
+      case None     => logger.error(s"No correlationId received from downstream with response status ${response.status}")
+    }
+
   }
 
   def badSuccessJsonFromAPI[Response]: Either[ErrorModel, Response] = {

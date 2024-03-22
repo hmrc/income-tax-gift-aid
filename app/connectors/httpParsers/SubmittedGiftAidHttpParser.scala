@@ -30,6 +30,7 @@ object SubmittedGiftAidHttpParser extends APIParser with Logging {
   implicit object SubmittedGiftAidHttpReads extends HttpReads[SubmittedGiftAidResponse] {
 
     override def read(method: String, url: String, response: HttpResponse): SubmittedGiftAidResponse = {
+      logCorrelationId(response)
       response.status match {
         case OK =>
           response.json.validate[SubmittedGiftAidModel].fold[SubmittedGiftAidResponse](
