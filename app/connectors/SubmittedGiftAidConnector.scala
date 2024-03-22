@@ -18,19 +18,22 @@ package connectors
 
 import config.AppConfig
 import connectors.httpParsers.SubmittedGiftAidHttpParser._
+import play.api.Logging
+
 import javax.inject.Inject
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubmittedGiftAidConnector @Inject() (val http: HttpClient,
-                                             val appConfig: AppConfig)(implicit ec:ExecutionContext) extends DesConnector {
+                                             val appConfig: AppConfig)(implicit ec:ExecutionContext) extends DesConnector with Logging{
 
   def getSubmittedGiftAid(nino: String, taxYear: Int)(implicit hc: HeaderCarrier): Future[SubmittedGiftAidResponse] = {
     val incomeSourcesUri: String = appConfig.desBaseUrl + s"/income-tax/nino/$nino/income-source/charity/" +
       s"annual/$taxYear"
 
     def desCall(implicit hc: HeaderCarrier): Future[SubmittedGiftAidResponse] = {
+      logger.info(s"[SubmittedGiftAidConnector] post call to DES")
       http.GET[SubmittedGiftAidResponse](incomeSourcesUri)
     }
 

@@ -18,7 +18,6 @@ package controllers
 
 import controllers.predicates.AuthorisedAction
 import models.submission.GiftAidSubmissionModel
-import play.api.Logging
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import services.GiftAidSubmissionService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -27,19 +26,17 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import utils.HeaderCarrierSyntax.HeaderCarrierSyntax
 
 class GiftAidSubmissionController @Inject()(
                                              service: GiftAidSubmissionService,
                                              auth: AuthorisedAction,
                                              cc: ControllerComponents
-                                           )(implicit ec: ExecutionContext) extends BackendController(cc) with Logging{
+                                           )(implicit ec: ExecutionContext) extends BackendController(cc) {
 
   def submit(nino: String, taxYear: Int): Action[AnyContent] = auth.async { user =>
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(user, user.session)
     val requestContent = user.body.asJson.flatMap(_.asOpt[GiftAidSubmissionModel])
-    val correlationIdToLog = hc.maybeCorrelationId.getOrElse("No Correlation Id in request")
-    logger.info(s"$correlationIdToLog:: [GiftAidSubmissionController] processing Request")
+
     requestContent match {
       case Some(model) => service.submit(nino, taxYear, model).map {
         case Right(_) => NoContent
