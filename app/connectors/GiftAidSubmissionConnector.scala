@@ -19,14 +19,16 @@ package connectors
 import config.AppConfig
 import connectors.httpParsers.GiftAidSubmissionHttpParser._
 import models.submission.GiftAidSubmissionModel
+import play.api.Logging
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import utils.HeaderCarrierSyntax.HeaderCarrierSyntax
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class GiftAidSubmissionConnector @Inject()(val appConfig: AppConfig,
                                            http: HttpClient
-                                          )(implicit executionContext: ExecutionContext) extends DesConnector {
+                                          )(implicit executionContext: ExecutionContext) extends DesConnector with Logging {
   //API#1390
   def submit(nino: String, taxYear: Int, submissionModel: GiftAidSubmissionModel
             )(implicit hc: HeaderCarrier): Future[GiftAidSubmissionResponse] = {
@@ -35,6 +37,8 @@ class GiftAidSubmissionConnector @Inject()(val appConfig: AppConfig,
       s"annual/$taxYear"
 
     def desCall(implicit hc: HeaderCarrier): Future[GiftAidSubmissionResponse] = {
+      val correlationIdToLog = hc.maybeCorrelationId.getOrElse("No CorrelationId found")
+      logger.info(s"$correlationIdToLog :: [CreateOrAmendAnnualIncomeSourcePeriodConnector] post call to DEs")
       http.POST[GiftAidSubmissionModel, GiftAidSubmissionResponse](giftAidSubmissionUri, submissionModel)
     }
 
