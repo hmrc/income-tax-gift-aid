@@ -30,6 +30,7 @@ object GiftAidSubmissionHttpParser extends APIParser {
   implicit object CreateIncomeSourceHttpReads extends HttpReads[GiftAidSubmissionResponse] {
 
     override def read(method: String, url: String, response: HttpResponse): GiftAidSubmissionResponse = {
+      logCorrelationId(response)
       response.status match {
         case OK =>
           Json.parse(response.body).validate[GiftAidSubmissionResponseModel].asOpt match {

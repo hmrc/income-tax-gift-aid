@@ -19,15 +19,17 @@ package connectors
 import config.AppConfig
 import connectors.httpParsers.CreateOrAmendAnnualIncomeSourcePeriodHttpParser._
 import models.submission.GiftAidSubmissionModel
+import play.api.Logging
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.TaxYearUtils.convertSpecificTaxYear
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import utils.HeaderCarrierSyntax.HeaderCarrierSyntax
 
 class CreateOrAmendAnnualIncomeSourcePeriodConnector @Inject()(val appConfig: AppConfig,
                                                                http: HttpClient
-                                                              )(implicit executionContext: ExecutionContext) extends IFConnector {
+                                                              )(implicit executionContext: ExecutionContext) extends IFConnector with Logging{
   val createOrAmendAnnualIncomeSourcePeriod = "1784"
 
   def submit(nino: String, taxYear: Int, submissionModel: GiftAidSubmissionModel
@@ -36,11 +38,14 @@ class CreateOrAmendAnnualIncomeSourcePeriodConnector @Inject()(val appConfig: Ap
     val taxYearParameter = convertSpecificTaxYear(taxYear)
     val giftAidSubmissionUri: String = appConfig.ifBaseUrl + s"/income-tax/$taxYearParameter/$nino/income-source/charity/annual"
 
-    def IFCall(implicit hc: HeaderCarrier): Future[CreateOrAmendAnnualIncomeSourcePeriodResponse] = {
+    def iFCall(implicit hc: HeaderCarrier): Future[CreateOrAmendAnnualIncomeSourcePeriodResponse] = {
+      val correlationIdToLog = hc.maybeCorrelationId.getOrElse("No CorrelationId found")
+      logger.info(s"$correlationIdToLog :: [CreateOrAmendAnnualIncomeSourcePeriodConnector] post call to IF")
       http.POST[GiftAidSubmissionModel, CreateOrAmendAnnualIncomeSourcePeriodResponse](giftAidSubmissionUri, submissionModel)
     }
 
-    IFCall(ifHeaderCarrier(giftAidSubmissionUri, createOrAmendAnnualIncomeSourcePeriod))
+    iFCall(ifHeaderCarrier(giftAidSubmissionUri, createOrAmendAnnualIncomeSourcePeriod))
+
   }
 
 }

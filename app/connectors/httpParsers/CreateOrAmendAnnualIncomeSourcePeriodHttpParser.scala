@@ -17,6 +17,7 @@
 package connectors.httpParsers
 
 import models.{ErrorModel, GiftAidSubmissionResponseModel}
+import play.api.Logging
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
@@ -24,12 +25,13 @@ import utils.PagerDutyHelper.PagerDutyKeys._
 import utils.PagerDutyHelper.pagerDutyLog
 
 
-object CreateOrAmendAnnualIncomeSourcePeriodHttpParser extends APIParser {
+object CreateOrAmendAnnualIncomeSourcePeriodHttpParser extends APIParser with Logging{
   type CreateOrAmendAnnualIncomeSourcePeriodResponse = Either[ErrorModel, GiftAidSubmissionResponseModel]
 
   implicit object CreateIncomeSourceHttpReads extends HttpReads[CreateOrAmendAnnualIncomeSourcePeriodResponse] {
 
     override def read(method: String, url: String, response: HttpResponse): CreateOrAmendAnnualIncomeSourcePeriodResponse = {
+      logCorrelationId(response)
       response.status match {
         case OK =>
           Json.parse(response.body).validate[GiftAidSubmissionResponseModel].asOpt match {

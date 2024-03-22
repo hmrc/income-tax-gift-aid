@@ -16,16 +16,23 @@
 
 package connectors.httpParsers
 
+import models.logging.CorrelationId.CorrelationIdHeaderKey
 import models.{ErrorBodyModel, ErrorModel, ErrorsBodyModel}
+import play.api.Logging
 import play.api.http.Status.INTERNAL_SERVER_ERROR
 import uk.gov.hmrc.http.HttpResponse
 import utils.PagerDutyHelper.PagerDutyKeys.{BAD_SUCCESS_JSON_FROM_API, UNEXPECTED_RESPONSE_FROM_API}
 import utils.PagerDutyHelper.{getCorrelationId, pagerDutyLog}
 
-trait APIParser {
+trait APIParser extends Logging {
 
   def logMessage(response: HttpResponse): String = {
     s"[APIParser][read] Received ${response.status} status code. Body:${response.body}" + getCorrelationId(response)
+  }
+
+  def logCorrelationId(response: HttpResponse): Unit = {
+    val correlationIdToLog = response.header(CorrelationIdHeaderKey).getOrElse("No CorrelationId in response")
+    logger.info(s"Received $correlationIdToLog from downstream")
   }
 
   def badSuccessJsonFromAPI[Response]: Either[ErrorModel, Response] = {

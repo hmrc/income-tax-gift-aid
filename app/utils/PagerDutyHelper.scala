@@ -40,7 +40,7 @@ object PagerDutyHelper extends Logging {
   def getCorrelationId(response:HttpResponse): String ={
     response.header(CorrelationIdHeaderKey) match {
       case Some(id) => s" CorrelationId: $id"
-      case _ => ""
+      case _ => "No CorrelationId"
     }
   }
 }
