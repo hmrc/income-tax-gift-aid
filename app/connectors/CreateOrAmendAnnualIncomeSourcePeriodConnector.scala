@@ -25,7 +25,6 @@ import utils.TaxYearUtils.convertSpecificTaxYear
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import utils.HeaderCarrierSyntax.HeaderCarrierSyntax
 
 class CreateOrAmendAnnualIncomeSourcePeriodConnector @Inject()(val appConfig: AppConfig,
                                                                http: HttpClient
@@ -39,8 +38,7 @@ class CreateOrAmendAnnualIncomeSourcePeriodConnector @Inject()(val appConfig: Ap
     val giftAidSubmissionUri: String = appConfig.ifBaseUrl + s"/income-tax/$taxYearParameter/$nino/income-source/charity/annual"
 
     def iFCall(implicit hc: HeaderCarrier): Future[CreateOrAmendAnnualIncomeSourcePeriodResponse] = {
-      val correlationIdToLog = hc.maybeCorrelationId.getOrElse("No CorrelationId found")
-      logger.info(s"$correlationIdToLog :: [CreateOrAmendAnnualIncomeSourcePeriodConnector] post call to IF")
+      logger.info(s"[CreateOrAmendAnnualIncomeSourcePeriodConnector] post call to IF")
       http.POST[GiftAidSubmissionModel, CreateOrAmendAnnualIncomeSourcePeriodResponse](giftAidSubmissionUri, submissionModel)
     }
 
