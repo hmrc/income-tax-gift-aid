@@ -33,7 +33,7 @@ trait APIParser extends Logging {
   def logCorrelationId(response: HttpResponse): Unit = {
     response.header(CorrelationIdHeaderKey) match {
       case Some(v)  => logger.info(s"Response with correlationId $v :: Received status ${response.status} from downstream")
-      case None     => logger.error(s"No correlationId received from downstream with response status ${response.status}")
+      case None     => logger.warn(s"No correlationId received from downstream with response status ${response.status}")
     }
 
   }
