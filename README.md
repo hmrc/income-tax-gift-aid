@@ -6,7 +6,7 @@ This is where we  make API calls from users for creating, viewing and updating t
 ### Running the service locally
 
 You will need to have the following:
-- Installed/configured [service manager v2](https://github.com/hmrc/sm2).
+- Installed/configured [service manager V2](https://github.com/hmrc/sm2).
 
 The service manager profile is:
 
