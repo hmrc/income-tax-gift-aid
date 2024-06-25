@@ -33,7 +33,7 @@ object GetAnnualIncomeSourcePeriodHttpParser extends APIParser with Logging {
         logCorrelationId(response)
         response.status match {
           case OK =>
-            response.json.validate[SubmittedGiftAidModel].fold[GetAnnualIncomeSourcePeriod](
+            (response.json \ "charitableGivingAnnual").validate[SubmittedGiftAidModel].fold[GetAnnualIncomeSourcePeriod](
             jsonErrors => badSuccessJsonFromAPI, parsedModel => Right(parsedModel))
           case INTERNAL_SERVER_ERROR =>
             pagerDutyLog(INTERNAL_SERVER_ERROR_FROM_API, logMessage(response))
