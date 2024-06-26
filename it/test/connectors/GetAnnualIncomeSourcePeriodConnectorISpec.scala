@@ -53,12 +53,14 @@ class GetAnnualIncomeSourcePeriodConnectorISpec extends IntegrationTest {
       Some(List("")), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67)
     )
     val gifts: GiftsModel = GiftsModel(Some(List("")), Some(12345.67), Some(12345.67), Some(12345.67))
+    val expectedResult = SubmittedGiftAidModel(Some(giftAidPayments), Some(gifts))
+    val responseBody: String = Json.obj(
+      "charitableGivingAnnual" -> expectedResult
+    ).toString()
 
     "GetAnnualIncomeSourcePeriodConnector" should {
 
       "include internal headers" when {
-        val expectedResult = SubmittedGiftAidModel(Some(giftAidPayments), Some(gifts))
-        val responseBody = Json.toJson(expectedResult).toString()
 
         val headersSentToDes = Seq(
           new HttpHeader(HeaderNames.authorisation, "Bearer secret"),
@@ -92,10 +94,9 @@ class GetAnnualIncomeSourcePeriodConnectorISpec extends IntegrationTest {
       "return a success response" when {
         "IF returns a 200 for specific tax year" in {
 
-          val expectedResult = SubmittedGiftAidModel(Some(giftAidPayments), Some(gifts))
           SubmittedGiftAidModel(Some(giftAidPayments), Some(gifts))
 
-          stubGetWithResponseBody(url, OK, Json.toJson(expectedResult).toString())
+          stubGetWithResponseBody(url, OK, responseBody)
 
           implicit val hc: HeaderCarrier = HeaderCarrier()
           val result = await(connector.getAnnualIncomeSourcePeriod(nino, specificTaxYear, deletedPeriod)(hc))
@@ -105,10 +106,9 @@ class GetAnnualIncomeSourcePeriodConnectorISpec extends IntegrationTest {
 
         "IF returns a 200 for specific tax year plus one" in {
 
-          val expectedResult = SubmittedGiftAidModel(Some(giftAidPayments), Some(gifts))
           SubmittedGiftAidModel(Some(giftAidPayments), Some(gifts))
 
-          stubGetWithResponseBody(urlPlusOne, OK, Json.toJson(expectedResult).toString())
+          stubGetWithResponseBody(urlPlusOne, OK, responseBody)
 
           implicit val hc: HeaderCarrier = HeaderCarrier()
           val result = await(connector.getAnnualIncomeSourcePeriod(nino, specificTaxYearPlusOne, deletedPeriod)(hc))
