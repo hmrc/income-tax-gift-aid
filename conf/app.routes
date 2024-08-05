@@ -1,2 +1,4 @@
 GET         /nino/:nino/sources        controllers.SubmittedGiftAidController.getSubmittedGiftAid(nino:String, taxYear: Int)
 POST        /nino/:nino/sources        controllers.GiftAidSubmissionController.submit(nino: String, taxYear: Int)
+
+GET         /:taxYear/tasks/:nino      controllers.CommonTaskListController.getCommonTaskList(taxYear: Int, nino: String)
