@@ -57,7 +57,8 @@ class BackendAppConfig @Inject()(config: Configuration, servicesConfig: Services
   lazy val authorisationTokenKey: String = "microservice.services.integration-framework.authorisation-token"
   lazy val ifEnvironment: String = servicesConfig.getString(key = "microservice.services.integration-framework.environment")
 
-  val personalFrontendBaseUrl: String = config.get[String]("microservice.services.personal-income-tax-submission-frontend.url")
+  val personalFrontendBaseUrl: String =
+    s"${config.get[String]("microservice.services.personal-income-tax-submission-frontend.url")}/update-and-submit-income-tax-return/personal-income"
 
   def authorisationTokenFor(api: String): String = config.get[String](s"microservice.services.integration-framework.authorisation-token.$api")
 }

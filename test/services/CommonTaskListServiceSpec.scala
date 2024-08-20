@@ -45,17 +45,18 @@ class CommonTaskListServiceSpec extends UnitTest {
 
   val emptyGiftAidResult: SubmittedGiftAidResponse = Left(ErrorModel(NOT_FOUND, ErrorBodyModel("SOME_CODE", "reason")))
 
+  // These urls will all direct to individual CYA pages rather than the existing CYA page once the journey has been split up.
   val fullTaskSection: TaskListSection =
     TaskListSection(SectionTitle.CharitableDonationsTitle,
       Some(List(
         TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, TaskStatus.Completed,
-          Some("http://localhost:9308/1234/charity/charity-donations-to-charity")),
+          Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
         TaskListSectionItem(TaskTitle.GiftsOfShares, TaskStatus.Completed,
-          Some("http://localhost:9308/1234/charity/charity-donations-to-charity")),
+          Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
         TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, TaskStatus.Completed,
-          Some("http://localhost:9308/1234/charity/charity-donations-to-charity")),
+          Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
         TaskListSectionItem(TaskTitle.GiftsToOverseas, TaskStatus.Completed,
-          Some("http://localhost:9308/1234/charity/charity-donations-to-charity"))
+          Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
       ))
     )
 
@@ -85,7 +86,7 @@ class CommonTaskListServiceSpec extends UnitTest {
       await(underTest) mustBe fullTaskSection.copy(
         taskItems = Some(List(
           TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, TaskStatus.Completed,
-            Some("http://localhost:9308/1234/charity/charity-donations-to-charity"))
+            Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
         ))
       )
     }
