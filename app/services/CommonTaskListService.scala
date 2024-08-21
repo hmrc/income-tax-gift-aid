@@ -67,11 +67,10 @@ class CommonTaskListService @Inject()(appConfig: AppConfig,
   private def getTasks(g: SubmittedGiftAidModel, taxYear: Int): Seq[TaskListSectionItem] = {
 
     // TODO: these will be links to the new CYA pages when they are made
-    val giftAidUrl: String = s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/charity-donations-to-charity"
-    val sharesOrSecuritiesUrl: String =
-      s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/charity-donations-to-charity"
-    val landOrPropertyUrl: String = s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/charity-donations-to-charity"
-    val overseasUrl: String = s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/charity-donations-to-charity"
+    val giftAidUrl: String = s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/check-donations-to-charity"
+    val sharesOrSecuritiesUrl: String = s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/check-donations-to-charity"
+    val landOrPropertyUrl: String = s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/check-donations-to-charity"
+    val overseasUrl: String = s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/check-donations-to-charity"
 
     val giftAid: Option[TaskListSectionItem] =
       if (hasValue(Seq(
