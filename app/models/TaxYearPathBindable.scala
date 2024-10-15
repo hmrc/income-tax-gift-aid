@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package config
+package models
 
-import play.api.inject.Binding
-import play.api.{Configuration, Environment}
-import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
+import play.api.mvc.PathBindable
 
-import java.time.Clock
+object TaxYearPathBindable {
 
-class Modules extends play.api.inject.Module {
+  implicit def pathBindable: PathBindable[TaxYear] = new PathBindable[TaxYear] {
 
-  override def bindings(environment: Environment, configuration: Configuration): collection.Seq[Binding[_]] =
-    Seq(
-      bind[AppConfig].toSelf.eagerly(),
-      bind[Clock].toInstance(Clock.systemUTC()),
-      bind[Encrypter with Decrypter].toProvider[CryptoProvider]
-    )
+    override def bind(key: String, value: String): Either[String, TaxYear] =
+      value match {
+        case result if result.matches("^20\\d{2}$") => Right(TaxYear(taxYear = result.toInt))
+        case _ => Left("Invalid taxYear")
+      }
+
+    override def unbind(key: String, value: TaxYear): String =
+      value.taxYear.toString
+  }
+  case class TaxYear(taxYear: Int)
 }
+

@@ -23,6 +23,8 @@ class AppConfigStub extends MockFactory {
 
   def config(environment: String = "test"): AppConfig = new AppConfig() {
     private val wireMockPort = 11111
+    private val timeToLiveValue = 28
+
     override val authBaseUrl: String = "/auth"
 
     override val auditingEnabled: Boolean = true
@@ -40,5 +42,9 @@ class AppConfigStub extends MockFactory {
     override val personalFrontendBaseUrl: String = "http://localhost:9308"
 
     override def authorisationTokenFor(apiVersion: String): String = ifAuthorisationToken + s".$apiVersion"
+
+    override def timeToLive: Long = timeToLiveValue
+
+    override def replaceIndexes: Boolean = false
   }
 }
