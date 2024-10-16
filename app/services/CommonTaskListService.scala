@@ -93,45 +93,4 @@ class CommonTaskListService @Inject()(appConfig: AppConfig,
 
     checkForAny
   }
-/*  private def getTasksBasedOnMiniJourney(g: SubmittedGiftAidModel, taxYear: Int): Seq[TaskListSectionItem] = {
-
-    // TODO: these will be links to the new CYA pages when they are made
-    val giftAidUrl: String = s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/check-donations-to-charity"
-    val sharesOrSecuritiesUrl: String = s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/check-donations-to-charity"
-    val landOrPropertyUrl: String = s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/check-donations-to-charity"
-    val overseasUrl: String = s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/check-donations-to-charity"
-
-    def taskItem(title: TaskTitle, status: TaskStatus, values: Seq[Option[BigDecimal]],url:String): Option[TaskListSectionItem] = {
-      if (hasValue(values)) {
-        Some(TaskListSectionItem(title, status, Some(url)))
-      } else {
-        None
-      }
-    }
-
-    // TaskItems with respective values
-    val tasks = Seq(
-
-      taskItem(TaskTitle.DonationsUsingGiftAid, TaskStatus.Completed, Seq(
-        g.giftAidPayments.flatMap(_.currentYear),
-        g.giftAidPayments.flatMap(_.oneOffCurrentYear),
-        g.giftAidPayments.flatMap(_.currentYearTreatedAsPreviousYear),
-        g.giftAidPayments.flatMap(_.nextYearTreatedAsCurrentYear)
-      ),giftAidUrl),
-      taskItem(TaskTitle.GiftsOfShares, TaskStatus.Completed, Seq(
-        g.gifts.flatMap(_.sharesOrSecurities)
-      ),sharesOrSecuritiesUrl),
-      taskItem(TaskTitle.GiftsOfLandOrProperty, TaskStatus.Completed, Seq(
-        g.gifts.flatMap(_.landAndBuildings)
-      ),landOrPropertyUrl),
-      taskItem(TaskTitle.GiftsToOverseas, TaskStatus.Completed, Seq(
-        g.giftAidPayments.flatMap(_.nonUkCharities),
-        g.gifts.flatMap(_.investmentsNonUkCharities)
-      ),overseasUrl)
-
-    )
-
-    tasks.flatten
-  }*/
-
 }
