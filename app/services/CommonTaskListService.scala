@@ -19,6 +19,7 @@ package services
 import config.AppConfig
 import models.giftAid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
 import models.tasklist._
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
@@ -47,7 +48,7 @@ class CommonTaskListService @Inject()(appConfig: AppConfig,
 
       val tasks: Option[Seq[TaskListSectionItem]] = {
 
-        val optionalTasks: Seq[TaskListSectionItem] = getTasks(g, taxYear)
+        val optionalTasks: Seq[TaskListSectionItem] = getTasksBasedOnLinearJourney(g, taxYear)
 
         if (optionalTasks.nonEmpty) {
           Some(optionalTasks)
@@ -64,7 +65,35 @@ class CommonTaskListService @Inject()(appConfig: AppConfig,
     values.exists(v => v.isDefined)
   }
 
-  private def getTasks(g: SubmittedGiftAidModel, taxYear: Int): Seq[TaskListSectionItem] = {
+  /**
+   * TODO : once the journeys are split into mini journeys.
+   *  Below function `getTasksBasedOnLinearJourney` can be deleted and `getTasksBasedOnMiniJourney` can be used
+   */
+
+  private def getTasksBasedOnLinearJourney(g: SubmittedGiftAidModel, taxYear: Int): Seq[TaskListSectionItem] = {
+    val url: String = s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/check-donations-to-charity"
+    val checkForAny = if (hasValue(Seq(
+      g.giftAidPayments.flatMap(_.currentYear),
+      g.giftAidPayments.flatMap(_.oneOffCurrentYear),
+      g.giftAidPayments.flatMap(_.currentYearTreatedAsPreviousYear),
+      g.giftAidPayments.flatMap(_.nextYearTreatedAsCurrentYear),
+      g.gifts.flatMap(_.landAndBuildings),
+      g.giftAidPayments.flatMap(_.nonUkCharities),
+      g.gifts.flatMap(_.investmentsNonUkCharities),
+      g.gifts.flatMap(_.sharesOrSecurities))
+    )) {
+      val giftAid = Some(TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, TaskStatus.Completed, Some(url)))
+      val sharesOrSecurities = Some(TaskListSectionItem(TaskTitle.GiftsOfShares, TaskStatus.Completed, Some(url)))
+      val landOrProperty = Some(TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, TaskStatus.Completed, Some(url)))
+      val overseas = Some(TaskListSectionItem(TaskTitle.GiftsToOverseas, TaskStatus.Completed, Some(url)))
+      Seq[Option[TaskListSectionItem]](giftAid, sharesOrSecurities, landOrProperty, overseas).flatten
+    } else {
+      Seq.empty
+    }
+
+    checkForAny
+  }
+  private def getTasksBasedOnMiniJourney(g: SubmittedGiftAidModel, taxYear: Int): Seq[TaskListSectionItem] = {
 
     // TODO: these will be links to the new CYA pages when they are made
     val giftAidUrl: String = s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/check-donations-to-charity"
@@ -72,39 +101,37 @@ class CommonTaskListService @Inject()(appConfig: AppConfig,
     val landOrPropertyUrl: String = s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/check-donations-to-charity"
     val overseasUrl: String = s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/check-donations-to-charity"
 
-    val giftAid: Option[TaskListSectionItem] =
-      if (hasValue(Seq(
+    def taskItem(title: TaskTitle, status: TaskStatus, values: Seq[Option[BigDecimal]],url:String): Option[TaskListSectionItem] = {
+      if (hasValue(values)) {
+        Some(TaskListSectionItem(title, status, Some(url)))
+      } else {
+        None
+      }
+    }
+
+    // TaskItems with respective values
+    val tasks = Seq(
+
+      taskItem(TaskTitle.DonationsUsingGiftAid, TaskStatus.Completed, Seq(
         g.giftAidPayments.flatMap(_.currentYear),
         g.giftAidPayments.flatMap(_.oneOffCurrentYear),
         g.giftAidPayments.flatMap(_.currentYearTreatedAsPreviousYear),
-        g.giftAidPayments.flatMap(_.nextYearTreatedAsCurrentYear)))) {
-        Some(TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, TaskStatus.Completed, Some(giftAidUrl)))
-    }
-    else {
-      None
-    }
-
-    val sharesOrSecurities: Option[TaskListSectionItem] = if (hasValue(Seq(g.gifts.flatMap(_.sharesOrSecurities)))) {
-      Some(TaskListSectionItem(TaskTitle.GiftsOfShares, TaskStatus.Completed, Some(sharesOrSecuritiesUrl)))
-    } else {
-      None
-    }
-
-    val landOrProperty: Option[TaskListSectionItem] = if (hasValue(Seq(g.gifts.flatMap(_.landAndBuildings)))) {
-      Some(TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, TaskStatus.Completed, Some(landOrPropertyUrl)))
-    } else {
-      None
-    }
-
-    val overseas: Option[TaskListSectionItem] =
-      if (hasValue(Seq(
+        g.giftAidPayments.flatMap(_.nextYearTreatedAsCurrentYear)
+      ),giftAidUrl),
+      taskItem(TaskTitle.GiftsOfShares, TaskStatus.Completed, Seq(
+        g.gifts.flatMap(_.sharesOrSecurities)
+      ),sharesOrSecuritiesUrl),
+      taskItem(TaskTitle.GiftsOfLandOrProperty, TaskStatus.Completed, Seq(
+        g.gifts.flatMap(_.landAndBuildings)
+      ),landOrPropertyUrl),
+      taskItem(TaskTitle.GiftsToOverseas, TaskStatus.Completed, Seq(
         g.giftAidPayments.flatMap(_.nonUkCharities),
-        g.gifts.flatMap(_.investmentsNonUkCharities)))) {
-      Some(TaskListSectionItem(TaskTitle.GiftsToOverseas, TaskStatus.Completed, Some(overseasUrl)))
-    } else {
-      None
-    }
+        g.gifts.flatMap(_.investmentsNonUkCharities)
+      ),overseasUrl)
 
-    Seq[Option[TaskListSectionItem]](giftAid, sharesOrSecurities, landOrProperty, overseas).flatten
+    )
+
+    tasks.flatten
   }
+
 }

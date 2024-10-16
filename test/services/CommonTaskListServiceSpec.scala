@@ -86,6 +86,12 @@ class CommonTaskListServiceSpec extends UnitTest {
       await(underTest) mustBe fullTaskSection.copy(
         taskItems = Some(List(
           TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, TaskStatus.Completed,
+            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsOfShares, TaskStatus.Completed,
+            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, TaskStatus.Completed,
+            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsToOverseas, TaskStatus.Completed,
             Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
         ))
       )
