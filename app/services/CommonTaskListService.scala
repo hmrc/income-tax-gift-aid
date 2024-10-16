@@ -93,7 +93,7 @@ class CommonTaskListService @Inject()(appConfig: AppConfig,
 
     checkForAny
   }
-  private def getTasksBasedOnMiniJourney(g: SubmittedGiftAidModel, taxYear: Int): Seq[TaskListSectionItem] = {
+/*  private def getTasksBasedOnMiniJourney(g: SubmittedGiftAidModel, taxYear: Int): Seq[TaskListSectionItem] = {
 
     // TODO: these will be links to the new CYA pages when they are made
     val giftAidUrl: String = s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/check-donations-to-charity"
@@ -132,6 +132,6 @@ class CommonTaskListService @Inject()(appConfig: AppConfig,
     )
 
     tasks.flatten
-  }
+  }*/
 
 }
