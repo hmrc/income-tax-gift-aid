@@ -19,7 +19,6 @@ package services
 import config.AppConfig
 import models.giftAid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
 import models.tasklist._
-import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
