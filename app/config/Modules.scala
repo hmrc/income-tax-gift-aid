@@ -26,7 +26,7 @@ class Modules extends play.api.inject.Module {
 
   override def bindings(environment: Environment, configuration: Configuration): collection.Seq[Binding[_]] =
     Seq(
-      bind[AppConfig].toSelf.eagerly(),
+      bind[AppConfig].to[BackendAppConfig].eagerly(),
       bind[Clock].toInstance(Clock.systemUTC()),
       bind[Encrypter with Decrypter].toProvider[CryptoProvider]
     )

@@ -67,5 +67,5 @@ class BackendAppConfig @Inject()(config: Configuration, servicesConfig: Services
   def authorisationTokenFor(api: String): String = config.get[String](s"microservice.services.integration-framework.authorisation-token.$api")
 
   def timeToLive: Long = Duration(config.get[String]("mongodb.timeToLive")).toDays.toInt
-  def replaceIndexes: Boolean = config.get[Boolean]("mongo.replaceIndexes")
+  def replaceIndexes: Boolean = config.get[Boolean]("mongodb.replaceIndexes")
 }
