@@ -16,11 +16,32 @@
 
 package utils
 
+import com.codahale.metrics.SharedMetricRegistries
+import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.reset
 import helpers.WiremockSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.http.HeaderCarrier
 
 trait IntegrationTest extends AnyWordSpec with Matchers with WiremockSpec {
+
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+    wireMockServer.start()
+    SharedMetricRegistries.clear()
+    WireMock.configureFor("localhost", wireMockPort)
+  }
+
+  override def afterAll(): Unit = {
+    super.afterAll()
+    wireMockServer.stop()
+  }
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    reset()
+  }
+
   lazy val emptyHeaderCarrier: HeaderCarrier = HeaderCarrier()
 }

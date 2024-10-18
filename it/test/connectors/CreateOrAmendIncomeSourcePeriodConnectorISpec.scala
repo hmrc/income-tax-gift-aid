@@ -26,14 +26,14 @@ import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, SessionId}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import utils.{IntegrationTest, TaxYearUtils}
 import utils.TaxYearUtils.convertSpecificTaxYear
+import utils.{IntegrationTest, TaxYearUtils}
 
 class CreateOrAmendIncomeSourcePeriodConnectorISpec extends IntegrationTest {
 
-  lazy val connector: CreateOrAmendAnnualIncomeSourcePeriodConnector = app.injector.instanceOf[CreateOrAmendAnnualIncomeSourcePeriodConnector]
-
   lazy val httpClient: HttpClient = app.injector.instanceOf[HttpClient]
+
+  lazy val connector: CreateOrAmendAnnualIncomeSourcePeriodConnector = new CreateOrAmendAnnualIncomeSourcePeriodConnector(appConfig("localhost"), httpClient)
 
   def appConfig(ifHost: String): AppConfig = new BackendAppConfig(app.injector.instanceOf[Configuration], app.injector.instanceOf[ServicesConfig]) {
     override lazy val ifBaseUrl: String = s"http://$ifHost:$wireMockPort"

@@ -30,9 +30,9 @@ import utils.IntegrationTest
 
 class GiftAidSubmissionConnectorISpec extends IntegrationTest  {
 
-  lazy val connector: GiftAidSubmissionConnector = app.injector.instanceOf[GiftAidSubmissionConnector]
-
   lazy val httpClient: HttpClient = app.injector.instanceOf[HttpClient]
+
+  lazy val connector: GiftAidSubmissionConnector = new GiftAidSubmissionConnector(appConfig("localhost"), httpClient)
 
   def appConfig(desHost: String): AppConfig = new BackendAppConfig(app.injector.instanceOf[Configuration], app.injector.instanceOf[ServicesConfig]) {
     override val desBaseUrl: String = s"http://$desHost:$wireMockPort"

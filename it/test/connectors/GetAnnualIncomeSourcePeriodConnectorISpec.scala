@@ -31,8 +31,9 @@ import utils.TaxYearUtils.convertSpecificTaxYear
 
 class GetAnnualIncomeSourcePeriodConnectorISpec extends IntegrationTest {
 
-  lazy val connector: GetAnnualIncomeSourcePeriodConnector = app.injector.instanceOf[GetAnnualIncomeSourcePeriodConnector]
   lazy val httpClient: HttpClient = app.injector.instanceOf[HttpClient]
+
+  lazy val connector: GetAnnualIncomeSourcePeriodConnector = new GetAnnualIncomeSourcePeriodConnector(httpClient, appConfig("localhost"))
 
   def appConfig(ifHost: String): BackendAppConfig = new BackendAppConfig(app.injector.instanceOf[Configuration], app.injector.instanceOf[ServicesConfig]) {
 
