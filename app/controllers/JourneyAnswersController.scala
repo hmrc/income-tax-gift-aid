@@ -42,11 +42,11 @@ class JourneyAnswersController @Inject()(
       .map {
         case Some(value) => Ok(Json.toJson(value))
         case None =>
-          logger.warn("[JourneyDataController.get] No existing data returning Not Found")
+          logger.warn("[JourneyAnswersController.get] No existing data returning Not Found")
           NotFound
       }.recover {
         case e =>
-          logger.error(s"[JourneyDataController.get] recovered from: ${e.getMessage}")
+          logger.error(s"[JourneyAnswersController.get] recovered from: ${e.getMessage}")
           InternalServerError
       }
   }
@@ -58,7 +58,7 @@ class JourneyAnswersController @Inject()(
       case _ => Future.successful(BadRequest)
     }).recover {
       case e =>
-        logger.error(s"[JourneyDataController.set] recovered from: ${e.getMessage}")
+        logger.error(s"[JourneyAnswersController.set] recovered from: ${e.getMessage}")
         InternalServerError
     }
   }
