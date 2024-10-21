@@ -274,7 +274,7 @@ class JourneyAnswersControllerSpec
       status(result) shouldBe UNAUTHORIZED
     }
 
-    "return BAD_REQUEST when the request does taxYear is invalid" in {
+    "return BAD_REQUEST when the taxYear is invalid" in {
 
       val request =
         FakeRequest(DELETE, routes.JourneyAnswersController.clear(journey, invalidTaxYear).url)
