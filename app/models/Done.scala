@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,7 @@
  * limitations under the License.
  */
 
-package config
+package models
 
-import play.api.inject.Binding
-import play.api.{Configuration, Environment}
-import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
-
-import java.time.Clock
-
-class Modules extends play.api.inject.Module {
-
-  override def bindings(environment: Environment, configuration: Configuration): collection.Seq[Binding[_]] =
-    Seq(
-      bind[AppConfig].to[BackendAppConfig].eagerly(),
-      bind[Clock].toInstance(Clock.systemUTC()),
-      bind[Encrypter with Decrypter].toProvider[CryptoProvider]
-    )
-}
+sealed abstract class Done
+object Done extends Done

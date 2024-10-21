@@ -20,6 +20,7 @@ import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.Inject
+import scala.concurrent.duration.Duration
 
 trait AppConfig {
 
@@ -39,6 +40,9 @@ trait AppConfig {
   val personalFrontendBaseUrl: String
 
   def authorisationTokenFor(apiVersion: String): String
+
+  def timeToLive: Long
+  def replaceIndexes: Boolean
 
 }
 
@@ -61,4 +65,7 @@ class BackendAppConfig @Inject()(config: Configuration, servicesConfig: Services
     s"${config.get[String]("microservice.services.personal-income-tax-submission-frontend.url")}/update-and-submit-income-tax-return/personal-income"
 
   def authorisationTokenFor(api: String): String = config.get[String](s"microservice.services.integration-framework.authorisation-token.$api")
+
+  def timeToLive: Long = Duration(config.get[String]("mongodb.timeToLive")).toDays.toInt
+  def replaceIndexes: Boolean = config.get[Boolean]("mongodb.replaceIndexes")
 }

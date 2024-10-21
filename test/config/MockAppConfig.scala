@@ -19,6 +19,8 @@ package config
 import org.scalamock.scalatest.MockFactory
 class MockAppConfig extends AppConfig with MockFactory {
 
+  private val timeToLiveValue = 28
+
   override val authBaseUrl: String = "/auth"
 
   override val auditingEnabled: Boolean = true
@@ -36,4 +38,7 @@ class MockAppConfig extends AppConfig with MockFactory {
 
   override def authorisationTokenFor(apiVersion: String): String = "someToken"
 
+  override def timeToLive: Long = timeToLiveValue
+
+  override def replaceIndexes: Boolean = false
 }
