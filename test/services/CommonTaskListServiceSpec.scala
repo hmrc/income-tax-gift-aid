@@ -19,22 +19,60 @@ package services
 import connectors.httpParsers.SubmittedGiftAidHttpParser.SubmittedGiftAidResponse
 import models._
 import models.giftAid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
-import models.tasklist.{SectionTitle, TaskListSection, TaskListSectionItem, TaskStatus, TaskTitle}
+import models.mongo.JourneyAnswers
+import models.tasklist.TaskStatus.{Completed, InProgress, NotStarted}
+import models.tasklist._
 import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
+import org.scalatest.time.SpanSugar.convertIntToGrainOfTime
+import play.api.Configuration
 import play.api.http.Status.NOT_FOUND
+import play.api.libs.json.{JsObject, Json}
+import repositories.JourneyAnswersRepository
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter, SymmetricCryptoFactory}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.mongo.MongoComponent
 import utils.UnitTest
 
+import java.security.SecureRandom
+import java.time.temporal.ChronoUnit
+import java.time.{Clock, Instant, ZoneId}
+import java.util.Base64
 import scala.concurrent.Future
+import scala.concurrent.duration.FiniteDuration
 
 class CommonTaskListServiceSpec extends UnitTest {
 
+  private val instant = Instant.now.truncatedTo(ChronoUnit.MILLIS)
+  private val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
+
+  private val aesKey = {
+    val aesKey = new Array[Byte](32)
+    new SecureRandom().nextBytes(aesKey)
+    Base64.getEncoder.encodeToString(aesKey)
+  }
+
+  protected def mongoUri: String            = s"mongodb://localhost:27017/income-tax-gift-aid"
+  protected def initTimeout: FiniteDuration = 5.seconds
+
+  protected lazy val mongoComponent: MongoComponent = MongoComponent(mongoUri, initTimeout)
+  private val configuration = Configuration("crypto.key" -> aesKey)
+
+  private implicit val crypto: Encrypter with Decrypter =
+    SymmetricCryptoFactory.aesGcmCryptoFromConfig("crypto", configuration.underlying)
+
+  protected val repository = new JourneyAnswersRepository(
+    mongoComponent = mongoComponent,
+    appConfig = mockAppConfig,
+    clock = stubClock
+  )
+
   val giftAidService: SubmittedGiftAidService = mock[SubmittedGiftAidService]
 
-  val service: CommonTaskListService = new CommonTaskListService(mockAppConfig, giftAidService)
+  val service: CommonTaskListService = new CommonTaskListService(mockAppConfig, giftAidService, repository)
 
   val nino: String = "12345678"
   val taxYear: Int = 1234
+  val mtdItId: String = "1234567890"
 
   val giftAidPayments: GiftAidPaymentsModel = GiftAidPaymentsModel(
     Some(List("")), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67), Some(12345.67)
@@ -68,7 +106,7 @@ class CommonTaskListServiceSpec extends UnitTest {
         .expects(nino, taxYear, *)
         .returning(Future.successful(fullGiftAidResult))
 
-      val underTest = service.get(taxYear, nino)
+      val underTest = service.get(taxYear, nino, mtdItId)
 
       await(underTest) mustBe fullTaskSection
     }
@@ -81,7 +119,7 @@ class CommonTaskListServiceSpec extends UnitTest {
           SubmittedGiftAidModel(Some(GiftAidPaymentsModel(None, Some(123.45), None, None, None, None)), None)
         )))
 
-      val underTest = service.get(taxYear, nino)
+      val underTest = service.get(taxYear, nino, mtdItId)
 
       await(underTest) mustBe fullTaskSection.copy(
         taskItems = Some(List(
@@ -97,13 +135,93 @@ class CommonTaskListServiceSpec extends UnitTest {
       )
     }
 
+    "return a task list section model with in progress status" in {
+
+      repository.set(JourneyAnswers(mtdItId, taxYear, "gift-aid", JsObject(Seq("status" -> Json.toJson(InProgress.entryName))), Instant.now()))
+
+      (giftAidService.getSubmittedGiftAid(_: String, _: Int)(_: HeaderCarrier))
+        .expects(nino, taxYear, *)
+        .returning(Future.successful(Right(
+          SubmittedGiftAidModel(Some(GiftAidPaymentsModel(None, Some(123.45), None, None, None, None)), None)
+        )))
+
+      val underTest = service.get(taxYear, nino, mtdItId)
+
+      await(underTest) mustBe fullTaskSection.copy(
+        taskItems = Some(List(
+          TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, TaskStatus.InProgress,
+            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsOfShares, TaskStatus.InProgress,
+            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, TaskStatus.InProgress,
+            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsToOverseas, TaskStatus.InProgress,
+            Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
+        ))
+      )
+    }
+
+    "return a task list section model with completed status from 'Have you finished..' stored response" in {
+
+      repository.set(JourneyAnswers(mtdItId, taxYear, "gift-aid", JsObject(Seq("status" -> Json.toJson(Completed.entryName))), Instant.now()))
+
+      (giftAidService.getSubmittedGiftAid(_: String, _: Int)(_: HeaderCarrier))
+        .expects(nino, taxYear, *)
+        .returning(Future.successful(Right(
+          SubmittedGiftAidModel(Some(GiftAidPaymentsModel(None, Some(123.45), None, None, None, None)), None)
+        )))
+
+      val underTest = service.get(taxYear, nino, mtdItId)
+
+      await(underTest) mustBe fullTaskSection.copy(
+        taskItems = Some(List(
+          TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, Completed,
+            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsOfShares, Completed,
+            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, Completed,
+            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsToOverseas, Completed,
+            Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
+        ))
+      )
+    }
+
+    "return a task list section model with not started status if stored status is invalid" in {
+
+      repository.set(JourneyAnswers(mtdItId, taxYear, "gift-aid", JsObject(Seq("status" -> Json.toJson("not a valid status"))), Instant.now()))
+
+      (giftAidService.getSubmittedGiftAid(_: String, _: Int)(_: HeaderCarrier))
+        .expects(nino, taxYear, *)
+        .returning(Future.successful(Right(
+          SubmittedGiftAidModel(Some(GiftAidPaymentsModel(None, Some(123.45), None, None, None, None)), None)
+        )))
+
+      val underTest = service.get(taxYear, nino, mtdItId)
+
+      await(underTest) mustBe fullTaskSection.copy(
+        taskItems = Some(List(
+          TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, NotStarted,
+            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsOfShares, NotStarted,
+            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, NotStarted,
+            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsToOverseas, NotStarted,
+            Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
+        ))
+      )
+    }
+
     "return an empty task list section model" in {
+
+      repository.clear(mtdItId, taxYear, "gift-aid")
 
       (giftAidService.getSubmittedGiftAid(_: String, _: Int)(_: HeaderCarrier))
         .expects(nino, taxYear, *)
         .returning(Future.successful(emptyGiftAidResult))
 
-      val underTest = service.get(taxYear, nino)
+      val underTest = service.get(taxYear, nino, mtdItId)
 
       await(underTest) mustBe TaskListSection(SectionTitle.CharitableDonationsTitle, None)
     }

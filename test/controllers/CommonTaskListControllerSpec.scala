@@ -17,7 +17,7 @@
 package controllers
 
 import models.tasklist.{SectionTitle, TaskListSection}
-import org.scalamock.handlers.CallHandler4
+import org.scalamock.handlers.CallHandler5
 import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
 import play.api.http.Status.OK
 import services.CommonTaskListService
@@ -36,9 +36,9 @@ class CommonTaskListControllerSpec extends UnitTest {
 
   val controller = new CommonTaskListController(commonTaskListService, authorisedAction, mockControllerComponents)
 
-  def mockDividendsService(): CallHandler4[Int, String, ExecutionContext, HeaderCarrier, Future[TaskListSection]] = {
-    (commonTaskListService.get(_: Int, _: String)(_: ExecutionContext, _: HeaderCarrier))
-      .expects(*, *, *, *)
+  def mockDividendsService(): CallHandler5[Int, String, String, ExecutionContext, HeaderCarrier, Future[TaskListSection]] = {
+    (commonTaskListService.get(_: Int, _: String, _: String)(_: ExecutionContext, _: HeaderCarrier))
+      .expects(*, *, *, *, *)
       .returning(Future.successful(TaskListSection(SectionTitle.CharitableDonationsTitle, None)))
   }
 

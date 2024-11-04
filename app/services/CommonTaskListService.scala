@@ -18,16 +18,21 @@ package services
 
 import config.AppConfig
 import models.giftAid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
+import models.mongo.JourneyAnswers
+import models.tasklist.TaskStatus.{Completed, InProgress, NotStarted}
 import models.tasklist._
+import play.api.Logging
+import repositories.JourneyAnswersRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CommonTaskListService @Inject()(appConfig: AppConfig,
-                                      giftAidService: SubmittedGiftAidService) {
+                                      giftAidService: SubmittedGiftAidService,
+                                      repository: JourneyAnswersRepository) extends Logging {
 
-  def get(taxYear: Int, nino: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[TaskListSection] = {
+  def get(taxYear: Int, nino: String, mtdItId: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[TaskListSection] = {
 
     val giftAid: Future[SubmittedGiftAidModel] = giftAidService.getSubmittedGiftAid(nino, taxYear).map {
       case Left(_) => SubmittedGiftAidModel(None, None)
@@ -35,28 +40,18 @@ class CommonTaskListService @Inject()(appConfig: AppConfig,
     }
 
     val allGifts = for {
-      ga <- giftAid
+      giftAidModel <- giftAid
     } yield {
       SubmittedGiftAidModel(
-        Some(ga.giftAidPayments.getOrElse(GiftAidPaymentsModel(None, None, None, None, None, None))),
-        Some(ga.gifts.getOrElse(GiftsModel(None, None, None, None)))
+        Some(giftAidModel.giftAidPayments.getOrElse(GiftAidPaymentsModel(None, None, None, None, None, None))),
+        Some(giftAidModel.gifts.getOrElse(GiftsModel(None, None, None, None)))
       )
     }
 
-    allGifts.map { g =>
-
-      val tasks: Option[Seq[TaskListSectionItem]] = {
-
-        val optionalTasks: Seq[TaskListSectionItem] = getTasksBasedOnLinearJourney(g, taxYear)
-
-        if (optionalTasks.nonEmpty) {
-          Some(optionalTasks)
-        } else {
-          None
-        }
-      }
-
-      TaskListSection(SectionTitle.CharitableDonationsTitle, tasks)
+    allGifts.flatMap { submittedGiftAidModel =>
+      getTaskItems(mtdItId, taxYear, "gift-aid", submittedGiftAidModel).map(items =>
+        TaskListSection(SectionTitle.CharitableDonationsTitle, items)
+      )
     }
   }
 
@@ -64,12 +59,7 @@ class CommonTaskListService @Inject()(appConfig: AppConfig,
     values.exists(v => v.isDefined)
   }
 
-  /**
-   * TODO : once the journeys are split into mini journeys.
-   *  Below function `getTasksBasedOnLinearJourney` can be deleted and `getTasksBasedOnMiniJourney` can be used
-   */
-
-  private def getTasksBasedOnLinearJourney(g: SubmittedGiftAidModel, taxYear: Int): Seq[TaskListSectionItem] = {
+  private def getTasksBasedOnLinearJourney(g: SubmittedGiftAidModel, taxYear: Int): Option[Seq[TaskListSectionItem]] = {
     val url: String = s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/check-donations-to-charity"
     val checkForAny = if (hasValue(Seq(
       g.giftAidPayments.flatMap(_.currentYear),
@@ -85,11 +75,42 @@ class CommonTaskListService @Inject()(appConfig: AppConfig,
       val sharesOrSecurities = Some(TaskListSectionItem(TaskTitle.GiftsOfShares, TaskStatus.Completed, Some(url)))
       val landOrProperty = Some(TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, TaskStatus.Completed, Some(url)))
       val overseas = Some(TaskListSectionItem(TaskTitle.GiftsToOverseas, TaskStatus.Completed, Some(url)))
-      Seq[Option[TaskListSectionItem]](giftAid, sharesOrSecurities, landOrProperty, overseas).flatten
+      Some(Seq[Option[TaskListSectionItem]](giftAid, sharesOrSecurities, landOrProperty, overseas).flatten)
     } else {
-      Seq.empty
+      None
     }
 
     checkForAny
   }
+
+  private def getStoredStatus(answers: JourneyAnswers, taxYear: Int): Option[Seq[TaskListSectionItem]] = {
+
+    val url: String = s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/check-donations-to-charity"
+
+    val status: TaskStatus = answers.data.value("status").validate[TaskStatus].asOpt match {
+      case Some(TaskStatus.Completed) => Completed
+      case Some(TaskStatus.InProgress) => InProgress
+      case _ =>
+        logger.info("[CommonTaskListService][getStatus] status stored in an invalid format, setting as 'Not yet started'.")
+        NotStarted
+    }
+
+    Some(Seq[TaskListSectionItem](
+      TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, status, Some(url)),
+      TaskListSectionItem(TaskTitle.GiftsOfShares, status, Some(url)),
+      TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, status, Some(url)),
+      TaskListSectionItem(TaskTitle.GiftsToOverseas, status, Some(url))
+    ))
+  }
+
+  private def getTaskItems(mtdItId: String, taxYear: Int, journey: String, giftAidModel: SubmittedGiftAidModel)
+                          (implicit ec: ExecutionContext): Future[Option[Seq[TaskListSectionItem]]] =
+
+    repository.get(mtdItId, taxYear, journey).map(answers =>
+      if (answers.isDefined) {
+        getStoredStatus(answers.get, taxYear)
+      } else {
+        getTasksBasedOnLinearJourney(giftAidModel, taxYear)
+      }
+    )
 }

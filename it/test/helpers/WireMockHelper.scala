@@ -17,8 +17,7 @@
 package helpers
 
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, delete, equalTo, get, getRequestedFor, patch, post, postRequestedFor, put, stubFor, urlEqualTo, urlMatching, verify}
+import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
@@ -47,12 +46,12 @@ trait WireMockHelper {
 
   def startWiremock(): Unit = {
     wireMockServer.start()
-    WireMock.configureFor(wiremockHost, wiremockPort)
+    configureFor(wiremockHost, wiremockPort)
   }
 
   def stopWiremock(): Unit = wireMockServer.stop()
 
-  def resetWiremock(): Unit = WireMock.reset()
+  def resetWiremock(): Unit = reset()
 
   def verifyPost(uri: String, optBody: Option[String] = None): Unit = {
     val uriMapping = postRequestedFor(urlEqualTo(uri))
@@ -111,6 +110,5 @@ trait WireMockHelper {
           withBody(responseBody)
       )
     )
-
 
 }
