@@ -137,6 +137,7 @@ class CommonTaskListServiceSpec extends UnitTest {
 
     "return a task list section model with in progress status" in {
 
+      repository.clear(mtdItId, taxYear,"gift-aid")
       repository.set(JourneyAnswers(mtdItId, taxYear, "gift-aid", JsObject(Seq("status" -> Json.toJson(InProgress.entryName))), Instant.now()))
 
       (giftAidService.getSubmittedGiftAid(_: String, _: Int)(_: HeaderCarrier))
@@ -163,6 +164,7 @@ class CommonTaskListServiceSpec extends UnitTest {
 
     "return a task list section model with completed status from 'Have you finished..' stored response" in {
 
+      repository.clear(mtdItId, taxYear,"gift-aid")
       repository.set(JourneyAnswers(mtdItId, taxYear, "gift-aid", JsObject(Seq("status" -> Json.toJson(Completed.entryName))), Instant.now()))
 
       (giftAidService.getSubmittedGiftAid(_: String, _: Int)(_: HeaderCarrier))
@@ -188,7 +190,7 @@ class CommonTaskListServiceSpec extends UnitTest {
     }
 
     "return a task list section model with not started status if stored status is invalid" in {
-
+      repository.clear(mtdItId, taxYear,"gift-aid")
       repository.set(JourneyAnswers(mtdItId, taxYear, "gift-aid", JsObject(Seq("status" -> Json.toJson("not a valid status"))), Instant.now()))
 
       (giftAidService.getSubmittedGiftAid(_: String, _: Int)(_: HeaderCarrier))
