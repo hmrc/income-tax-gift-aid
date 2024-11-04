@@ -59,11 +59,6 @@ class CommonTaskListService @Inject()(appConfig: AppConfig,
     values.exists(v => v.isDefined)
   }
 
-  /**
-   * TODO : once the journeys are split into mini journeys.
-   * Below function `getTasksBasedOnLinearJourney` can be deleted and `getTasksBasedOnMiniJourney` can be used
-   */
-
   private def getTasksBasedOnLinearJourney(g: SubmittedGiftAidModel, taxYear: Int): Option[Seq[TaskListSectionItem]] = {
     val url: String = s"${appConfig.personalFrontendBaseUrl}/$taxYear/charity/check-donations-to-charity"
     val checkForAny = if (hasValue(Seq(
