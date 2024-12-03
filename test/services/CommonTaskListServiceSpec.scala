@@ -89,13 +89,13 @@ class CommonTaskListServiceSpec extends UnitTest {
     TaskListSection(SectionTitle.CharitableDonationsTitle,
       Some(List(
         TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, TaskStatus.Completed,
-          Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
         TaskListSectionItem(TaskTitle.GiftsOfShares, TaskStatus.Completed,
-          Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
         TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, TaskStatus.Completed,
-          Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
         TaskListSectionItem(TaskTitle.GiftsToOverseas, TaskStatus.Completed,
-          Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
+          Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity"))
       ))
     )
 
@@ -103,13 +103,13 @@ class CommonTaskListServiceSpec extends UnitTest {
     TaskListSection(SectionTitle.CharitableDonationsTitle,
       Some(List(
         TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, TaskStatus.InProgress,
-          Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
         TaskListSectionItem(TaskTitle.GiftsOfShares, TaskStatus.InProgress,
-          Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
         TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, TaskStatus.InProgress,
-          Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
         TaskListSectionItem(TaskTitle.GiftsToOverseas, TaskStatus.InProgress,
-          Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
+          Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity"))
       ))
     )
 
@@ -139,13 +139,13 @@ class CommonTaskListServiceSpec extends UnitTest {
       await(underTest) mustBe inProgressTaskSection.copy(
         taskItems = Some(List(
           TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, TaskStatus.InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfShares, TaskStatus.InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, TaskStatus.InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsToOverseas, TaskStatus.InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity"))
         ))
       )
     }
@@ -166,13 +166,13 @@ class CommonTaskListServiceSpec extends UnitTest {
       await(underTest) mustBe fullTaskSection.copy(
         taskItems = Some(List(
           TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, TaskStatus.InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfShares, TaskStatus.InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, TaskStatus.InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsToOverseas, TaskStatus.InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity"))
         ))
       )
     }
@@ -193,13 +193,13 @@ class CommonTaskListServiceSpec extends UnitTest {
       await(underTest) mustBe inProgressTaskSection.copy(
         taskItems = Some(List(
           TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfShares, InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsToOverseas, InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity"))
         ))
       )
     }
@@ -230,13 +230,13 @@ class CommonTaskListServiceSpec extends UnitTest {
       await(underTest) mustBe inProgressTaskSection.copy(
         taskItems = Some(List(
           TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, Completed,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfShares, Completed,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, Completed,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsToOverseas, Completed,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity"))
         ))
       )
     }
@@ -257,13 +257,13 @@ class CommonTaskListServiceSpec extends UnitTest {
       await(underTest) mustBe fullTaskSection.copy(
         taskItems = Some(List(
           TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, NotStarted,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfShares, NotStarted,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, NotStarted,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsToOverseas, NotStarted,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity"))
         ))
       )
     }
@@ -294,13 +294,13 @@ class CommonTaskListServiceSpec extends UnitTest {
       await(underTest) mustBe fullTaskSection.copy(
         taskItems = Some(List(
           TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, Completed,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfShares, Completed,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, Completed,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsToOverseas, Completed,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity"))
         ))
       )
     }
@@ -331,13 +331,13 @@ class CommonTaskListServiceSpec extends UnitTest {
       await(underTest) mustBe inProgressTaskSection.copy(
         taskItems = Some(List(
           TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfShares, InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsToOverseas, InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity"))
         ))
       )
     }
