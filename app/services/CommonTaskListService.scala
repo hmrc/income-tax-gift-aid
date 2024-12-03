@@ -71,10 +71,13 @@ class CommonTaskListService @Inject()(appConfig: AppConfig,
       g.gifts.flatMap(_.investmentsNonUkCharities),
       g.gifts.flatMap(_.sharesOrSecurities))
     )) {
-      val giftAid = Some(TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, TaskStatus.Completed, Some(url)))
-      val sharesOrSecurities = Some(TaskListSectionItem(TaskTitle.GiftsOfShares, TaskStatus.Completed, Some(url)))
-      val landOrProperty = Some(TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, TaskStatus.Completed, Some(url)))
-      val overseas = Some(TaskListSectionItem(TaskTitle.GiftsToOverseas, TaskStatus.Completed, Some(url)))
+
+      val statusCheck = if(appConfig.sectionCompletedQuestionEnabled) InProgress else Completed
+
+      val giftAid = Some(TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, statusCheck, Some(url)))
+      val sharesOrSecurities = Some(TaskListSectionItem(TaskTitle.GiftsOfShares, statusCheck, Some(url)))
+      val landOrProperty = Some(TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, statusCheck, Some(url)))
+      val overseas = Some(TaskListSectionItem(TaskTitle.GiftsToOverseas, statusCheck, Some(url)))
       Some(Seq[Option[TaskListSectionItem]](giftAid, sharesOrSecurities, landOrProperty, overseas).flatten)
     } else {
       None

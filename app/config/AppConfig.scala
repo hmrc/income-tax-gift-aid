@@ -44,6 +44,8 @@ trait AppConfig {
   def timeToLive: Long
   def replaceIndexes: Boolean
 
+  val sectionCompletedQuestionEnabled: Boolean
+
 }
 
 class BackendAppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig) extends AppConfig {
@@ -68,4 +70,7 @@ class BackendAppConfig @Inject()(config: Configuration, servicesConfig: Services
 
   def timeToLive: Long = Duration(config.get[String]("mongodb.timeToLive")).toDays.toInt
   def replaceIndexes: Boolean = config.get[Boolean]("mongodb.replaceIndexes")
+
+  lazy val sectionCompletedQuestionEnabled: Boolean = servicesConfig.getBoolean("feature-switch.sectionCompletedQuestionEnabled")
+
 }

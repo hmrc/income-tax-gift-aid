@@ -41,6 +41,8 @@ class AppConfigStub extends MockFactory {
 
     override val personalFrontendBaseUrl: String = "http://localhost:9308"
 
+    override val sectionCompletedQuestionEnabled: Boolean = true
+
     override def authorisationTokenFor(apiVersion: String): String = ifAuthorisationToken + s".$apiVersion"
 
     override def timeToLive: Long = timeToLiveValue

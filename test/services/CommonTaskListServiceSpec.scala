@@ -16,6 +16,7 @@
 
 package services
 
+import config.MockAppConfig
 import connectors.httpParsers.SubmittedGiftAidHttpParser.SubmittedGiftAidResponse
 import models._
 import models.giftAid.{GiftAidPaymentsModel, GiftsModel, SubmittedGiftAidModel}
@@ -88,13 +89,27 @@ class CommonTaskListServiceSpec extends UnitTest {
     TaskListSection(SectionTitle.CharitableDonationsTitle,
       Some(List(
         TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, TaskStatus.Completed,
-          Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
         TaskListSectionItem(TaskTitle.GiftsOfShares, TaskStatus.Completed,
-          Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
         TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, TaskStatus.Completed,
-          Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+          Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
         TaskListSectionItem(TaskTitle.GiftsToOverseas, TaskStatus.Completed,
-          Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
+          Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity"))
+      ))
+    )
+
+  val inProgressTaskSection: TaskListSection =
+    TaskListSection(SectionTitle.CharitableDonationsTitle,
+      Some(List(
+        TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, TaskStatus.InProgress,
+          Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
+        TaskListSectionItem(TaskTitle.GiftsOfShares, TaskStatus.InProgress,
+          Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
+        TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, TaskStatus.InProgress,
+          Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
+        TaskListSectionItem(TaskTitle.GiftsToOverseas, TaskStatus.InProgress,
+          Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity"))
       ))
     )
 
@@ -108,7 +123,7 @@ class CommonTaskListServiceSpec extends UnitTest {
 
       val underTest = service.get(taxYear, nino, mtdItId)
 
-      await(underTest) mustBe fullTaskSection
+      await(underTest) mustBe inProgressTaskSection
     }
 
     "return a minimal task list section model" in {
@@ -121,21 +136,21 @@ class CommonTaskListServiceSpec extends UnitTest {
 
       val underTest = service.get(taxYear, nino, mtdItId)
 
-      await(underTest) mustBe fullTaskSection.copy(
+      await(underTest) mustBe inProgressTaskSection.copy(
         taskItems = Some(List(
-          TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, TaskStatus.Completed,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
-          TaskListSectionItem(TaskTitle.GiftsOfShares, TaskStatus.Completed,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
-          TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, TaskStatus.Completed,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
-          TaskListSectionItem(TaskTitle.GiftsToOverseas, TaskStatus.Completed,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
+          TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, TaskStatus.InProgress,
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsOfShares, TaskStatus.InProgress,
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, TaskStatus.InProgress,
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsToOverseas, TaskStatus.InProgress,
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity"))
         ))
       )
     }
 
-    "return a task list section model with in progress status" in {
+    "return a task list section model with 'In Progress' status" in {
 
       repository.clear(mtdItId, taxYear,"gift-aid")
       repository.set(JourneyAnswers(mtdItId, taxYear, "gift-aid", JsObject(Seq("status" -> Json.toJson(InProgress.entryName))), Instant.now()))
@@ -151,18 +166,55 @@ class CommonTaskListServiceSpec extends UnitTest {
       await(underTest) mustBe fullTaskSection.copy(
         taskItems = Some(List(
           TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, TaskStatus.InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfShares, TaskStatus.InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, TaskStatus.InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsToOverseas, TaskStatus.InProgress,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity"))
         ))
       )
     }
 
-    "return a task list section model with completed status from 'Have you finished..' stored response" in {
+    "return a task list section model with 'In Progress' status from 'Have you finished..' stored response" in {
+
+      repository.clear(mtdItId, taxYear,"gift-aid")
+      repository.set(JourneyAnswers(mtdItId, taxYear, "gift-aid", JsObject(Seq("status" -> Json.toJson(InProgress.entryName))), Instant.now()))
+
+      (giftAidService.getSubmittedGiftAid(_: String, _: Int)(_: HeaderCarrier))
+        .expects(nino, taxYear, *)
+        .returning(Future.successful(Right(
+          SubmittedGiftAidModel(Some(GiftAidPaymentsModel(None, Some(123.45), None, None, None, None)), None)
+        )))
+
+      val underTest = service.get(taxYear, nino, mtdItId)
+
+      await(underTest) mustBe inProgressTaskSection.copy(
+        taskItems = Some(List(
+          TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, InProgress,
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsOfShares, InProgress,
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, InProgress,
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsToOverseas, InProgress,
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity"))
+        ))
+      )
+    }
+
+    "return a task list section model with 'Completed' status from 'Have you finished..' stored response and Section Completed Question Enabled is false" in {
+
+      val sCQDisabledAppConfig: MockAppConfig = new MockAppConfig{
+        override val sectionCompletedQuestionEnabled: Boolean = false
+      }
+
+      val service: CommonTaskListService = new CommonTaskListService(
+        appConfig = sCQDisabledAppConfig,
+        giftAidService = giftAidService,
+        repository = repository
+      )
 
       repository.clear(mtdItId, taxYear,"gift-aid")
       repository.set(JourneyAnswers(mtdItId, taxYear, "gift-aid", JsObject(Seq("status" -> Json.toJson(Completed.entryName))), Instant.now()))
@@ -175,21 +227,22 @@ class CommonTaskListServiceSpec extends UnitTest {
 
       val underTest = service.get(taxYear, nino, mtdItId)
 
-      await(underTest) mustBe fullTaskSection.copy(
+      await(underTest) mustBe inProgressTaskSection.copy(
         taskItems = Some(List(
           TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, Completed,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfShares, Completed,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, Completed,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsToOverseas, Completed,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity"))
         ))
       )
     }
 
-    "return a task list section model with not started status if stored status is invalid" in {
+    "return a task list section model with 'Not Started' status if stored status is invalid" in {
+
       repository.clear(mtdItId, taxYear,"gift-aid")
       repository.set(JourneyAnswers(mtdItId, taxYear, "gift-aid", JsObject(Seq("status" -> Json.toJson("not a valid status"))), Instant.now()))
 
@@ -204,13 +257,87 @@ class CommonTaskListServiceSpec extends UnitTest {
       await(underTest) mustBe fullTaskSection.copy(
         taskItems = Some(List(
           TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, NotStarted,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfShares, NotStarted,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, NotStarted,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity")),
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
           TaskListSectionItem(TaskTitle.GiftsToOverseas, NotStarted,
-            Some("http://localhost:9308/1234/charity/check-donations-to-charity"))
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity"))
+        ))
+      )
+    }
+
+    "return 'Completed' status when Journey Answers are not defined and Section Completed Question Enabled is false" in  {
+
+      val sCQDisabledAppConfig: MockAppConfig = new MockAppConfig{
+        override val sectionCompletedQuestionEnabled: Boolean = false
+      }
+
+      val service: CommonTaskListService = new CommonTaskListService(
+        appConfig = sCQDisabledAppConfig,
+        giftAidService = giftAidService,
+        repository = repository
+      )
+
+      repository.clear(mtdItId, taxYear,"gift-aid")
+
+      (giftAidService.getSubmittedGiftAid(_: String, _: Int)(_: HeaderCarrier))
+        .expects(nino, taxYear, *)
+        .returning(Future.successful(Right(
+          SubmittedGiftAidModel(Some(GiftAidPaymentsModel(None, Some(123.45), None, None, None, None)), None)
+        )))
+
+
+      val underTest = service.get(taxYear, nino, mtdItId)
+
+      await(underTest) mustBe fullTaskSection.copy(
+        taskItems = Some(List(
+          TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, Completed,
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsOfShares, Completed,
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, Completed,
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsToOverseas, Completed,
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity"))
+        ))
+      )
+    }
+
+    "return 'In Progress' status when Journey Answers are not defined and Section Completed Question Enabled is true" in  {
+
+      val sCQDisabledAppConfig: MockAppConfig = new MockAppConfig{
+        override val sectionCompletedQuestionEnabled: Boolean = true
+      }
+
+      val service: CommonTaskListService = new CommonTaskListService(
+        appConfig = sCQDisabledAppConfig,
+        giftAidService = giftAidService,
+        repository = repository
+      )
+
+      repository.clear(mtdItId, taxYear,"gift-aid")
+
+      (giftAidService.getSubmittedGiftAid(_: String, _: Int)(_: HeaderCarrier))
+        .expects(nino, taxYear, *)
+        .returning(Future.successful(Right(
+          SubmittedGiftAidModel(Some(GiftAidPaymentsModel(None, Some(123.45), None, None, None, None)), None)
+        )))
+
+
+      val underTest = service.get(taxYear, nino, mtdItId)
+
+      await(underTest) mustBe inProgressTaskSection.copy(
+        taskItems = Some(List(
+          TaskListSectionItem(TaskTitle.DonationsUsingGiftAid, InProgress,
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsOfShares, InProgress,
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsOfLandOrProperty, InProgress,
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity")),
+          TaskListSectionItem(TaskTitle.GiftsToOverseas, InProgress,
+            Some(s"http://localhost:9308/$taxYear/charity/check-donations-to-charity"))
         ))
       )
     }
