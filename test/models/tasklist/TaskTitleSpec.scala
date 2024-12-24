@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.taskList
+package models.tasklist
 
 import models.tasklist.TaskTitle
 import models.tasklist.TaskTitle._

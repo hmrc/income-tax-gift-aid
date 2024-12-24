@@ -45,7 +45,7 @@ trait AppConfig {
   def replaceIndexes: Boolean
 
   val sectionCompletedQuestionEnabled: Boolean
-  val emaSupportingAgentsEnabled: Boolean
+  def emaSupportingAgentsEnabled: Boolean
 
 }
 
