@@ -21,9 +21,9 @@ import models.logging.CorrelationId.CorrelationIdHeaderKey
 import org.scalamock.scalatest.MockFactory
 import support.providers.AppConfigStubProvider
 import support.stubs.AppConfigStub
-import testUtils.TestSuite
 import uk.gov.hmrc.http.HeaderNames._
 import uk.gov.hmrc.http.{Authorization, HeaderCarrier, SessionId}
+import utils.TestSuite
 
 import java.util.UUID
 
