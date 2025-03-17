@@ -17,7 +17,6 @@
 package controllers.predicates
 
 import common.{DelegatedAuthRules, EnrolmentIdentifiers, EnrolmentKeys}
-import config.AppConfig
 import models.User
 import models.logging.CorrelationIdMdc.withEnrichedCorrelationId
 import play.api.Logger
@@ -34,7 +33,6 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthorisedAction @Inject()()(implicit val authConnector: AuthConnector,
-                                   appConfig: AppConfig,
                                    defaultActionBuilder: DefaultActionBuilder,
                                    val cc: ControllerComponents) extends AuthorisedFunctions {
 
@@ -109,30 +107,10 @@ class AuthorisedAction @Inject()()(implicit val authConnector: AuthConnector,
       .withIdentifier(EnrolmentIdentifiers.individualId, mtdId)
       .withDelegatedAuthRule(DelegatedAuthRules.agentDelegatedAuthRule)
 
-  private def secondaryAgentPredicate(mtdId: String): Predicate =
-    Enrolment(EnrolmentKeys.SupportingAgent)
-      .withIdentifier(EnrolmentIdentifiers.individualId, mtdId)
-      .withDelegatedAuthRule(DelegatedAuthRules.supportingAgentDelegatedAuthRule)
-
-  private def agentRecovery[A](block: User[A] => Future[Result], mtdItId: String)
-                              (implicit request: Request[A], hc: HeaderCarrier): PartialFunction[Throwable, Future[Result]] = {
+  private def agentRecovery(): PartialFunction[Throwable, Future[Result]] = {
     case _: NoActiveSession =>
-      val logMessage = s"$agentAuthLogString - No active session."
-      logger.warn(logMessage)
+      logger.warn(s"$agentAuthLogString - No active session.")
       unauthorized
-    case _: AuthorisationException if appConfig.emaSupportingAgentsEnabled =>
-      authorised(secondaryAgentPredicate(mtdItId))
-        .retrieve(allEnrolments)(
-          enrolments => handleForValidAgent(block, mtdItId, enrolments, isSupportingAgent = true)
-        )
-        .recover {
-          case _: AuthorisationException =>
-            logger.warn(s"$agentAuthLogString - Agent does not have delegated primary or secondary authority for Client.")
-            Unauthorized
-          case e =>
-            logger.error(s"$agentAuthLogString - Unexpected exception of type '${e.getClass.getSimpleName}' was caught.")
-            InternalServerError
-        }
     case _: AuthorisationException =>
       logger.warn(s"$agentAuthLogString - Agent does not have delegated authority for Client.")
       unauthorized
@@ -143,11 +121,10 @@ class AuthorisedAction @Inject()()(implicit val authConnector: AuthConnector,
 
   private def handleForValidAgent[A](block: User[A] => Future[Result],
                                      mtdItId: String,
-                                     enrolments: Enrolments,
-                                     isSupportingAgent: Boolean)
+                                     enrolments: Enrolments)
                                     (implicit request: Request[A]): Future[Result] = {
     enrolmentGetIdentifierValue(EnrolmentKeys.Agent, EnrolmentIdentifiers.agentReference, enrolments) match {
-      case Some(arn) => block(User(mtdItId, Some(arn), isSupportingAgent))
+      case Some(arn) => block(User(mtdItId, Some(arn)))
       case None =>
         val logMessage = s"$agentAuthLogString - Agent with no HMRC-AS-AGENT enrolment."
         logger.warn(logMessage)
@@ -158,8 +135,8 @@ class AuthorisedAction @Inject()()(implicit val authConnector: AuthConnector,
   private[predicates] def agentAuthentication[A](block: User[A] => Future[Result], mtdItId: String)
                                              (implicit request: Request[A], hc: HeaderCarrier): Future[Result] =
     authorised(agentAuthPredicate(mtdItId))
-      .retrieve(allEnrolments)(enrolments => handleForValidAgent(block, mtdItId, enrolments, isSupportingAgent = false))
-      .recoverWith(agentRecovery(block, mtdItId))
+      .retrieve(allEnrolments)(enrolments => handleForValidAgent(block, mtdItId, enrolments))
+      .recoverWith(agentRecovery())
 
   private[predicates] def enrolmentGetIdentifierValue(checkedKey: String,
                                                       checkedIdentifier: String,
