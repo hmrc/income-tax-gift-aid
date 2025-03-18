@@ -45,8 +45,6 @@ trait AppConfig {
   def replaceIndexes: Boolean
 
   val sectionCompletedQuestionEnabled: Boolean
-  def emaSupportingAgentsEnabled: Boolean
-
 }
 
 class BackendAppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig) extends AppConfig {
@@ -73,6 +71,4 @@ class BackendAppConfig @Inject()(config: Configuration, servicesConfig: Services
   def replaceIndexes: Boolean = config.get[Boolean]("mongodb.replaceIndexes")
 
   lazy val sectionCompletedQuestionEnabled: Boolean = servicesConfig.getBoolean("feature-switch.sectionCompletedQuestionEnabled")
-  lazy val emaSupportingAgentsEnabled: Boolean = servicesConfig.getBoolean("feature-switch.ema-supporting-agents-enabled")
-
 }

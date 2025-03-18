@@ -18,8 +18,8 @@ import sbt.*
 
 object AppDependencies {
 
-  private val bootstrapVersion = "9.5.0"
-  private val hmrcMongoVersion = "2.2.0"
+  private val bootstrapVersion = "9.11.0"
+  private val hmrcMongoVersion = "2.6.0"
 
   private val jacksonAndPlayExclusions: Seq[InclusionRule] = Seq(
     ExclusionRule(organization = "com.fasterxml.jackson.core"),
@@ -39,11 +39,11 @@ object AppDependencies {
   )
 
   val test: Seq[ModuleID] = Seq(
-    "uk.gov.hmrc"             %% "bootstrap-test-play-30"     % bootstrapVersion  % "test",
-    "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-30"    % hmrcMongoVersion  % "test",
-    "org.scalatest"           %% "scalatest"                  % "3.2.19"          % "test",
-    "org.pegdown"             %  "pegdown"                    % "1.6.0"           % "test",
-    "org.scalamock"           %% "scalamock"                  % "5.1.0"           % "test",
+    "uk.gov.hmrc"             %% "bootstrap-test-play-30"     % bootstrapVersion,
+    "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-30"    % hmrcMongoVersion,
+    "org.scalatest"           %% "scalatest"                  % "3.2.19",
+    "org.pegdown"             %  "pegdown"                    % "1.6.0",
+    "org.scalamock"           %% "scalamock"                  % "5.1.0",
     "org.mockito"             %% "mockito-scala"              % "1.17.37"
-  )
+  ).map(_ % Test)
 }
