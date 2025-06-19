@@ -1,4 +1,3 @@
-
 # income-tax-gift-aid
 
 This is where we  make API calls from users for creating, viewing and updating the donations to charity section of their income tax return.
@@ -6,7 +5,10 @@ This is where we  make API calls from users for creating, viewing and updating t
 ### Running the service locally
 
 You will need to have the following:
+- Installed [MongoDB](https://docs.mongodb.com/manual/installation/)
 - Installed/configured [service manager V2](https://github.com/hmrc/sm2).
+
+This can be found in the [developer handbook](https://docs.tax.service.gov.uk/mdtp-handbook/documentation/developer-set-up/)
 
 The service manager profile is:
 
@@ -15,7 +17,7 @@ The service manager profile is:
 Run the following command to start the remaining services locally:
 
     sudo mongod (If not already running)
-    sm2 --start INCOME_TAX_SUBMISSION_ALL -r
+    sm2 --start INCOME_TAX_SUBMISSION_ALL
 
 This service runs on port: `localhost:9316`
 
@@ -25,6 +27,11 @@ This service runs on port: `localhost:9316`
 - Run Unit and Integration Tests: `sbt test it/test`
 - Run Unit and Integration Tests with coverage report: `sbt runAllChecks`<br/>
   which runs `clean compile coverage test it/test coverageReport dependencyUpdates`
+
+### Feature Switches
+| Feature                         | Description                                                      |
+|---------------------------------|------------------------------------------------------------------|
+| sectionCompletedQuestionEnabled | Redirects user to Have you completed this section from CYA page  |
 
 ### Gift-aid endpoints:
 
@@ -36,6 +43,10 @@ This service runs on port: `localhost:9316`
 All donations to charity data is retrieved/updated via the downstream system:
 
 - DES (Data Exchange Service)
+
+### Upstream services:
+
+Personal-Income-Tax-Submission-Frontend repository see its [readMe](https://github.com/hmrc/personal-income-tax-submission-frontend/blob/main/README.md) for more.
 
 ### Gift-aid income source
 
