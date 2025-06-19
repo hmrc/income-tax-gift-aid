@@ -45,7 +45,7 @@ lazy val coverageSettings: Seq[Setting[?]] = {
   )
 }
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.12"
+ThisBuild / scalaVersion := "2.13.16"
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
@@ -57,7 +57,6 @@ lazy val microservice = Project(appName, file("."))
     )
   )
   .settings(PlayKeys.playDefaultPort := 9316)
-  .settings(resolvers += Resolver.jcenterRepo)
   .settings(coverageSettings *)
   .settings(RoutesKeys.routesImport ++= Seq("models.TaxYearPathBindable._", "models.TaxYearPathBindable.TaxYear"))
   .disablePlugins(sbt.plugins.JUnitXmlReportPlugin)
@@ -68,4 +67,4 @@ lazy val it = project
   .dependsOn(microservice % "test->test") // the "test->test" allows reusing test code and test dependencies
   .settings(DefaultBuildSettings.itSettings())
 
-addCommandAlias("runAllChecks", "clean;compile;scalastyle;coverage;test;it/test;coverageReport")
+addCommandAlias("runAllChecks", "clean;compile;coverage;test;it/test;coverageReport;dependencyUpdates")

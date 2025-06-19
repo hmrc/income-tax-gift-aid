@@ -16,8 +16,7 @@
 
 package config
 
-import org.scalamock.scalatest.MockFactory
-class MockAppConfig extends AppConfig with MockFactory {
+class MockAppConfig extends AppConfig {
 
   private val timeToLiveValue = 28
 
