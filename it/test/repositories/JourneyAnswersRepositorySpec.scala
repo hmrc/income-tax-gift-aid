@@ -27,7 +27,6 @@ import org.mongodb.scala.model.Filters
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.{BeforeAndAfterAll, OptionValues}
-import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
