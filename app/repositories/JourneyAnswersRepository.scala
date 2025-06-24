@@ -29,6 +29,7 @@ import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.toBson
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import uk.gov.hmrc.play.http.logging.Mdc
 
 import java.time.{Clock, Instant}
 import javax.inject.{Inject, Singleton}
@@ -57,40 +58,43 @@ class JourneyAnswersRepository @Inject()(
   )
 
   def keepAlive(mtdItId: String, taxYear: Int, journey: String): Future[Done] =
-    collection
-      .updateOne(
-        filter = filterByMtdItIdYear(mtdItId, taxYear, journey),
-        update = Updates.set("lastUpdated", Instant.now(clock))
-      )
-      .toFuture()
-      .map(_ => Done)
-
-  def get(mtdItId: String, taxYear: Int, journey: String): Future[Option[JourneyAnswers]] = {
-    keepAlive(mtdItId, taxYear, journey).flatMap {
-      _ =>
-        collection
-          .find(filterByMtdItIdYear(mtdItId, taxYear, journey))
-          .headOption()
+    Mdc.preservingMdc {
+      collection
+        .updateOne(
+          filter = filterByMtdItIdYear(mtdItId, taxYear, journey),
+          update = Updates.set("lastUpdated", Instant.now(clock))
+        )
+        .toFuture()
+        .map(_ => Done)
     }
-  }
 
-  def set(userData: JourneyAnswers): Future[Done] = {
+  def get(mtdItId: String, taxYear: Int, journey: String): Future[Option[JourneyAnswers]] =
+    Mdc.preservingMdc {
+      keepAlive(mtdItId, taxYear, journey).flatMap {
+        _ =>
+          collection
+            .find(filterByMtdItIdYear(mtdItId, taxYear, journey))
+            .headOption()
+      }
+    }
 
-    val updatedUserData = userData copy (lastUpdated = Instant.now(clock))
-
-    collection
-      .replaceOne(
-        filter = filterByMtdItIdYear(updatedUserData.mtdItId, updatedUserData.taxYear, updatedUserData.journey),
-        replacement = updatedUserData,
-        options = ReplaceOptions().upsert(true)
-      )
-      .toFuture()
-      .map(_ => Done)
-  }
+  def set(userData: JourneyAnswers): Future[Done] =
+    Mdc.preservingMdc {
+      collection
+        .replaceOne(
+          filter = filterByMtdItIdYear(userData.mtdItId, userData.taxYear, userData.journey),
+          replacement = userData.copy(lastUpdated = Instant.now(clock)),
+          options = ReplaceOptions().upsert(true)
+        )
+        .toFuture()
+        .map(_ => Done)
+    }
 
   def clear(mtdItId: String, taxYear: Int, journey: String): Future[Done] =
-    collection
-      .deleteOne(filterByMtdItIdYear(mtdItId, taxYear, journey))
-      .toFuture()
-      .map(_ => Done)
+    Mdc.preservingMdc {
+      collection
+        .deleteOne(filterByMtdItIdYear(mtdItId, taxYear, journey))
+        .toFuture()
+        .map(_ => Done)
+    }
 }
