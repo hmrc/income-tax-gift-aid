@@ -35,7 +35,7 @@ class SubmittedGiftAidConnector @Inject() (val http: HttpClientV2,
 
     def desCall(implicit hc: HeaderCarrier): Future[SubmittedGiftAidResponse] = {
       logger.info(s"[SubmittedGiftAidConnector] post call to DES")
-      http.get(url"incomeSourcesUri").execute
+      http.get(url"$incomeSourcesUri").execute
     }
 
     desCall(desHeaderCarrier(incomeSourcesUri))
