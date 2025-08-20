@@ -22,12 +22,13 @@ import connectors.httpParsers.GetAnnualIncomeSourcePeriodHttpParser.GetAnnualInc
 import play.api.Logging
 
 import javax.inject.Inject
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, StringContextOps}
+import uk.gov.hmrc.http.client.HttpClientV2
 import utils.TaxYearUtils.convertSpecificTaxYear
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class GetAnnualIncomeSourcePeriodConnector @Inject()(val http: HttpClient,
+class GetAnnualIncomeSourcePeriodConnector @Inject()(val http: HttpClientV2,
                                                      val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector with Logging{
   val GetAnnualIncomeSourcePeriod = "1785"
   def getAnnualIncomeSourcePeriod(nino: String,
@@ -36,8 +37,8 @@ class GetAnnualIncomeSourcePeriodConnector @Inject()(val http: HttpClient,
     val taxYearParameter = convertSpecificTaxYear(taxYear)
     val incomeSourcesUri: String = appConfig.ifBaseUrl + s"/income-tax/$taxYearParameter/$nino/income-source/charity/annual?deleteReturnPeriod=false"
     logger.info(s"[GetAnnualIncomeSourcePeriodConnector] GET call to IF")
-    http.GET[GetAnnualIncomeSourcePeriod](incomeSourcesUri)(GetAnnualIncomeSourcePeriodReads,
-      ifHeaderCarrier(incomeSourcesUri, GetAnnualIncomeSourcePeriod), ec)
+    http.get(url"$incomeSourcesUri")(ifHeaderCarrier(incomeSourcesUri, GetAnnualIncomeSourcePeriod)).execute[GetAnnualIncomeSourcePeriod]
+
   }
 }
 

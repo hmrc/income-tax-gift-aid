@@ -17,15 +17,19 @@
 package connectors
 
 import config.AppConfig
-import connectors.httpParsers.GiftAidSubmissionHttpParser._
+import connectors.httpParsers.GiftAidSubmissionHttpParser.{GiftAidSubmissionResponse, _}
 import models.submission.GiftAidSubmissionModel
 import play.api.Logging
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.StringContextOps
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class GiftAidSubmissionConnector @Inject()(val appConfig: AppConfig,
-                                           http: HttpClient
+                                           http: HttpClientV2
                                           )(implicit executionContext: ExecutionContext) extends DesConnector with Logging {
   //API#1390
   def submit(nino: String, taxYear: Int, submissionModel: GiftAidSubmissionModel
@@ -36,7 +40,8 @@ class GiftAidSubmissionConnector @Inject()(val appConfig: AppConfig,
 
     def desCall(implicit hc: HeaderCarrier): Future[GiftAidSubmissionResponse] = {
       logger.info(s"[GiftAidSubmissionConnector] post call to DES")
-      http.POST[GiftAidSubmissionModel, GiftAidSubmissionResponse](giftAidSubmissionUri, submissionModel)
+//      http.POST[GiftAidSubmissionModel, GiftAidSubmissionResponse](giftAidSubmissionUri, submissionModel)
+      http.post(url"$giftAidSubmissionUri").withBody(Json.toJson(submissionModel)).execute[GiftAidSubmissionResponse]
     }
 
     desCall(desHeaderCarrier(giftAidSubmissionUri))
