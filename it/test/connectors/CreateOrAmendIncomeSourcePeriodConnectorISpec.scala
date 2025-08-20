@@ -25,7 +25,7 @@ import play.api.Configuration
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, SessionId}
+import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, SessionId}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.TaxYearUtils.convertSpecificTaxYear
 import utils.{IntegrationTest, TaxYearUtils}

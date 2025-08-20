@@ -22,7 +22,7 @@ import connectors.httpParsers.GetAnnualIncomeSourcePeriodHttpParser.GetAnnualInc
 import play.api.Logging
 
 import javax.inject.Inject
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, StringContextOps}
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.http.client.HttpClientV2
 import utils.TaxYearUtils.convertSpecificTaxYear
 

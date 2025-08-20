@@ -18,12 +18,11 @@ package connectors
 
 import config.AppConfig
 import connectors.httpParsers.CreateOrAmendAnnualIncomeSourcePeriodHttpParser._
-import connectors.httpParsers.GiftAidSubmissionHttpParser.GiftAidSubmissionResponse
 import models.submission.GiftAidSubmissionModel
 import play.api.Logging
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, StringContextOps}
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import utils.TaxYearUtils.convertSpecificTaxYear
 
 import javax.inject.Inject

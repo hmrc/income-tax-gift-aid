@@ -22,7 +22,7 @@ import play.api.Logging
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.Inject
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, StringContextOps}
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
