@@ -20,14 +20,16 @@ import config.AppConfig
 import connectors.httpParsers.CreateOrAmendAnnualIncomeSourcePeriodHttpParser._
 import models.submission.GiftAidSubmissionModel
 import play.api.Logging
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import utils.TaxYearUtils.convertSpecificTaxYear
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CreateOrAmendAnnualIncomeSourcePeriodConnector @Inject()(val appConfig: AppConfig,
-                                                               http: HttpClient
+                                                               http: HttpClientV2
                                                               )(implicit executionContext: ExecutionContext) extends IFConnector with Logging{
   val createOrAmendAnnualIncomeSourcePeriod = "1784"
 
@@ -39,7 +41,8 @@ class CreateOrAmendAnnualIncomeSourcePeriodConnector @Inject()(val appConfig: Ap
 
     def iFCall(implicit hc: HeaderCarrier): Future[CreateOrAmendAnnualIncomeSourcePeriodResponse] = {
       logger.info(s"[CreateOrAmendAnnualIncomeSourcePeriodConnector] post call to IF")
-      http.POST[GiftAidSubmissionModel, CreateOrAmendAnnualIncomeSourcePeriodResponse](giftAidSubmissionUri, submissionModel)
+//      http.POST[GiftAidSubmissionModel, CreateOrAmendAnnualIncomeSourcePeriodResponse](giftAidSubmissionUri, submissionModel)
+      http.post(url"$giftAidSubmissionUri").withBody(Json.toJson(submissionModel)).execute[CreateOrAmendAnnualIncomeSourcePeriodResponse]
     }
 
     iFCall(ifHeaderCarrier(giftAidSubmissionUri, createOrAmendAnnualIncomeSourcePeriod))

@@ -24,15 +24,16 @@ import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
 import play.api.Configuration
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, SessionId}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, SessionId}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.IntegrationTest
 
 class SubmittedGiftAidConnectorISpec extends IntegrationTest {
 
-  lazy val httpClient: HttpClient = app.injector.instanceOf[HttpClient]
+  lazy val httpClientV2: HttpClientV2 = app.injector.instanceOf[HttpClientV2]
 
-  lazy val connector: SubmittedGiftAidConnector = new SubmittedGiftAidConnector(httpClient, appConfig("localhost"))
+  lazy val connector: SubmittedGiftAidConnector = new SubmittedGiftAidConnector(httpClientV2, appConfig("localhost"))
 
   def appConfig(desHost: String): AppConfig = new BackendAppConfig(app.injector.instanceOf[Configuration], app.injector.instanceOf[ServicesConfig]) {
     override val desBaseUrl: String = s"http://$desHost:$wireMockPort"
@@ -72,7 +73,7 @@ class SubmittedGiftAidConnectorISpec extends IntegrationTest {
 
       "the host for DES is 'External'" in {
         implicit val hc: HeaderCarrier = HeaderCarrier(sessionId = Some(SessionId("sessionIdValue")))
-        val connector = new SubmittedGiftAidConnector(httpClient, appConfig(externalHost))
+        val connector = new SubmittedGiftAidConnector(httpClientV2, appConfig(externalHost))
 
         stubGetWithResponseBody(url, OK, responseBody, headersSentToDes)
 

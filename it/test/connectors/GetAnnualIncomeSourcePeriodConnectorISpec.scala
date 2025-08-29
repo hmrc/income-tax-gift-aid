@@ -24,16 +24,17 @@ import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
 import play.api.Configuration
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, SessionId}
+import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, SessionId}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.{IntegrationTest, TaxYearUtils}
 import utils.TaxYearUtils.convertSpecificTaxYear
+import uk.gov.hmrc.http.client.HttpClientV2
 
 class GetAnnualIncomeSourcePeriodConnectorISpec extends IntegrationTest {
 
-  lazy val httpClient: HttpClient = app.injector.instanceOf[HttpClient]
+  lazy val httpClientV2: HttpClientV2 = app.injector.instanceOf[HttpClientV2]
 
-  lazy val connector: GetAnnualIncomeSourcePeriodConnector = new GetAnnualIncomeSourcePeriodConnector(httpClient, appConfig("localhost"))
+  lazy val connector: GetAnnualIncomeSourcePeriodConnector = new GetAnnualIncomeSourcePeriodConnector(httpClientV2, appConfig("localhost"))
 
   def appConfig(ifHost: String): BackendAppConfig = new BackendAppConfig(app.injector.instanceOf[Configuration], app.injector.instanceOf[ServicesConfig]) {
 
@@ -73,7 +74,7 @@ class GetAnnualIncomeSourcePeriodConnectorISpec extends IntegrationTest {
 
         "the host for IF is 'Internal'" in {
           implicit val hc: HeaderCarrier = HeaderCarrier(sessionId = Some(SessionId("sessionIdValue")))
-          val connector = new GetAnnualIncomeSourcePeriodConnector(httpClient, appConfig(internalHost))
+          val connector = new GetAnnualIncomeSourcePeriodConnector(httpClientV2, appConfig(internalHost))
           stubGetWithResponseBody(url, OK, responseBody, headersSentToDes)
 
           val result = await(connector.getAnnualIncomeSourcePeriod(nino, specificTaxYear, deletedPeriod)(hc))
@@ -83,7 +84,7 @@ class GetAnnualIncomeSourcePeriodConnectorISpec extends IntegrationTest {
 
         "the host for IF is 'External'" in {
           implicit val hc: HeaderCarrier = HeaderCarrier(sessionId = Some(SessionId("sessionIdValue")))
-          val connector = new GetAnnualIncomeSourcePeriodConnector(httpClient, appConfig(externalHost))
+          val connector = new GetAnnualIncomeSourcePeriodConnector(httpClientV2, appConfig(externalHost))
           stubGetWithResponseBody(url, OK, responseBody, headersSentToDes)
 
           val result = await(connector.getAnnualIncomeSourcePeriod(nino, specificTaxYear, deletedPeriod)(hc))
